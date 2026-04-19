@@ -1,25 +1,25 @@
-import type { StrapiArticle } from '@/lib/strapi/types';
-import { ArticleBody } from '@/components/article/article-body';
-import { ArticleHeader } from '@/components/article/article-header';
-import { AuthorCard } from '@/components/article/author-card';
-import { RelatedArticles } from '@/components/article/related-articles';
-import { TableOfContents } from '@/components/article/toc';
-import { ShareButtons } from '@/components/article/share-buttons';
-import { PageHeader } from '@/components/page-header';
-import { LocaleGate } from './locale-gate';
+import type { StrapiArticle } from "@/lib/strapi/types"
+import { ArticleBody } from "@/components/article/article-body"
+import { ArticleHeader } from "@/components/article/article-header"
+import { AuthorCard } from "@/components/article/author-card"
+import { RelatedArticles } from "@/components/article/related-articles"
+import { TableOfContents } from "@/components/article/toc"
+import { ShareButtons } from "@/components/article/share-buttons"
+import { PageHeader } from "@/components/page-header"
+import { LocaleGate } from "./locale-gate"
 
 interface ArticleMeta {
-  readingTime: { minutes: number; text: string };
-  headings: Array<{ text: string; slug: string; level: number }>;
+  readingTime: { minutes: number; text: string }
+  headings: Array<{ text: string; slug: string; level: number }>
 }
 
 interface Props {
-  articleEn: StrapiArticle | null;
-  articleId: StrapiArticle | null;
-  metaEn: ArticleMeta | null;
-  metaId: ArticleMeta | null;
-  relatedEn: StrapiArticle[];
-  relatedId: StrapiArticle[];
+  articleEn: StrapiArticle | null
+  articleId: StrapiArticle | null
+  metaEn: ArticleMeta | null
+  metaId: ArticleMeta | null
+  relatedEn: StrapiArticle[]
+  relatedId: StrapiArticle[]
 }
 
 export async function ArticleView({
@@ -31,25 +31,25 @@ export async function ArticleView({
   relatedId,
 }: Props) {
   // Pre-render both bodies on the server for SEO + static code highlighting
-  const bodyEn = articleEn ? await ArticleBody({ body: articleEn.body }) : null;
-  const bodyId = articleId ? await ArticleBody({ body: articleId.body }) : null;
+  const bodyEn = articleEn ? await ArticleBody({ body: articleEn.body }) : null
+  const bodyId = articleId ? await ArticleBody({ body: articleId.body }) : null
 
   const shareUrl =
-    typeof window !== 'undefined'
+    typeof window !== "undefined"
       ? window.location.href
-      : `https://jurnal.dev/jurnal/${(articleEn || articleId)?.slug}`;
+      : `https://jurnal.dev/jurnal/${(articleEn || articleId)?.slug}`
 
   return (
-    <main style={{ minHeight: '100vh', position: 'relative' }}>
+    <main style={{ minHeight: "100vh", position: "relative" }}>
       <div className="grid-overlay" />
 
       <div
         style={{
-          position: 'relative',
+          position: "relative",
           zIndex: 1,
-          maxWidth: '960px',
-          margin: '0 auto',
-          padding: '2rem 1.5rem 4rem',
+          maxWidth: "960px",
+          margin: "0 auto",
+          padding: "2rem 1.5rem 4rem",
         }}
       >
         <PageHeader />
@@ -60,13 +60,16 @@ export async function ArticleView({
             {/* EN content */}
             {articleEn && metaEn && (
               <LocaleGate locale="en">
-                <ArticleHeader article={articleEn} readingTime={metaEn.readingTime.text} />
+                <ArticleHeader
+                  article={articleEn}
+                  readingTime={metaEn.readingTime.text}
+                />
                 {bodyEn}
                 <div
                   style={{
-                    borderTop: '1px solid var(--border)',
-                    marginTop: '3rem',
-                    paddingTop: '2rem',
+                    borderTop: "1px solid var(--border)",
+                    marginTop: "3rem",
+                    paddingTop: "2rem",
                   }}
                 >
                   <ShareButtons title={articleEn.title} url={shareUrl} />
@@ -81,20 +84,26 @@ export async function ArticleView({
             {/* ID content */}
             {articleId && metaId && (
               <LocaleGate locale="id">
-                <ArticleHeader article={articleId} readingTime={metaId.readingTime.text} />
+                <ArticleHeader
+                  article={articleId}
+                  readingTime={metaId.readingTime.text}
+                />
                 {bodyId}
                 <div
                   style={{
-                    borderTop: '1px solid var(--border)',
-                    marginTop: '3rem',
-                    paddingTop: '2rem',
+                    borderTop: "1px solid var(--border)",
+                    marginTop: "3rem",
+                    paddingTop: "2rem",
                   }}
                 >
                   <ShareButtons title={articleId.title} url={shareUrl} />
                 </div>
                 {articleId.author && <AuthorCard author={articleId.author} />}
                 {relatedId.length > 0 && (
-                  <RelatedArticles articles={relatedId} label="Jurnal lainnya" />
+                  <RelatedArticles
+                    articles={relatedId}
+                    label="Jurnal lainnya"
+                  />
                 )}
               </LocaleGate>
             )}
@@ -104,17 +113,16 @@ export async function ArticleView({
               <LocaleGate locale="id">
                 <div
                   style={{
-                    padding: '2rem',
-                    textAlign: 'center',
-                    color: 'var(--text-muted)',
-                    border: '1px dashed var(--border)',
-                    borderRadius: '10px',
-                    margin: '2rem 0',
+                    padding: "2rem",
+                    textAlign: "center",
+                    color: "var(--text-muted)",
+                    border: "1px dashed var(--border)",
+                    borderRadius: "10px",
+                    margin: "2rem 0",
                   }}
                 >
-                  Versi Bahasa Indonesia belum tersedia.{' '}
-                  <br />
-                  <em style={{ color: 'var(--text-subtle)' }}>
+                  Versi Bahasa Indonesia belum tersedia. <br />
+                  <em style={{ color: "var(--text-subtle)" }}>
                     This article is only available in English.
                   </em>
                 </div>
@@ -124,17 +132,17 @@ export async function ArticleView({
               <LocaleGate locale="en">
                 <div
                   style={{
-                    padding: '2rem',
-                    textAlign: 'center',
-                    color: 'var(--text-muted)',
-                    border: '1px dashed var(--border)',
-                    borderRadius: '10px',
-                    margin: '2rem 0',
+                    padding: "2rem",
+                    textAlign: "center",
+                    color: "var(--text-muted)",
+                    border: "1px dashed var(--border)",
+                    borderRadius: "10px",
+                    margin: "2rem 0",
                   }}
                 >
                   English version not available yet.
                   <br />
-                  <em style={{ color: 'var(--text-subtle)' }}>
+                  <em style={{ color: "var(--text-subtle)" }}>
                     Artikel ini hanya tersedia dalam Bahasa Indonesia.
                   </em>
                 </div>
@@ -158,5 +166,5 @@ export async function ArticleView({
         </div>
       </div>
     </main>
-  );
+  )
 }

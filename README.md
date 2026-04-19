@@ -28,10 +28,10 @@ npm run dev
 
 ## Pages
 
-| Route | Description |
-|-------|-------------|
-| `/` | Landing page (hero, about, journal preview, lab, connect) |
-| `/jurnal` | All journal entries (grid, filterable by locale) |
+| Route            | Description                                               |
+| ---------------- | --------------------------------------------------------- |
+| `/`              | Landing page (hero, about, journal preview, lab, connect) |
+| `/jurnal`        | All journal entries (grid, filterable by locale)          |
 | `/jurnal/[slug]` | Individual article with TOC, related posts, share buttons |
 
 ---
@@ -111,19 +111,19 @@ The journal supports **rich Markdown content** via Strapi CMS (or mock data for 
 
 ### Supported content elements
 
-| Element | Markdown | Notes |
-|---------|----------|-------|
-| Headings | `## H2`, `### H3` | Auto-generates TOC, supports anchor links |
-| Code blocks | ```` ```lang ```` | Server-side highlighted with Shiki, copy button included |
-| Inline code | `` `code` `` | |
-| Images | `![alt](url)` | Renders as `<figure>` with caption from alt text |
-| Tables | GFM tables | Styled with Swiss aesthetic |
-| Blockquotes | `> quote` | |
-| Lists | `- item` / `1. item` | |
-| Links | `[text](url)` | External links auto-open in new tab |
-| **Callouts** | `:::info ... :::` | Custom: `info`, `warning`, `tip`, `success` |
-| **Mermaid** | ```` ```mermaid ```` | Client-side rendered, theme-aware |
-| **Instagram** | Paste URL on own line | Auto-detected & embedded |
+| Element       | Markdown              | Notes                                                    |
+| ------------- | --------------------- | -------------------------------------------------------- |
+| Headings      | `## H2`, `### H3`     | Auto-generates TOC, supports anchor links                |
+| Code blocks   | ` ```lang `           | Server-side highlighted with Shiki, copy button included |
+| Inline code   | `` `code` ``          |                                                          |
+| Images        | `![alt](url)`         | Renders as `<figure>` with caption from alt text         |
+| Tables        | GFM tables            | Styled with Swiss aesthetic                              |
+| Blockquotes   | `> quote`             |                                                          |
+| Lists         | `- item` / `1. item`  |                                                          |
+| Links         | `[text](url)`         | External links auto-open in new tab                      |
+| **Callouts**  | `:::info ... :::`     | Custom: `info`, `warning`, `tip`, `success`              |
+| **Mermaid**   | ` ```mermaid `        | Client-side rendered, theme-aware                        |
+| **Instagram** | Paste URL on own line | Auto-detected & embedded                                 |
 
 ### Example article body
 
@@ -137,11 +137,11 @@ Quick note: gunakan Python 3.10+ untuk compatibility terbaik.
 :::
 
 ```typescript
-const client = new Anthropic();
+const client = new Anthropic()
 const message = await client.messages.create({
   model: "claude-opus-4-7",
   messages: [{ role: "user", content: "Hello!" }],
-});
+})
 ```
 
 ```mermaid
@@ -164,12 +164,14 @@ Jangan commit `.env` file ke git!
 ### 1. Update personal info
 
 Edit **`src/lib/content.ts`**:
+
 - `role`, `tagline`, `about`, `currentlyValue`, `stackValue` — untuk kedua bahasa (`en` & `id`)
 - `socials` array — ganti URL kalau mau tambah/remove platform
 
 ### 2. Update metadata (SEO)
 
 Edit **`src/app/layout.tsx`** bagian `metadata`:
+
 - `metadataBase` — ubah ke domain production lu (default: `https://jurnal.dev`)
 - `title`, `description`, `keywords`
 - `openGraph.images` — add OG image URL (recommended: `/og.png` di public folder, 1200×630px)
@@ -178,16 +180,24 @@ Edit **`src/app/layout.tsx`** bagian `metadata`:
 ### 3. Ganti avatar
 
 Opsi A — pake foto asli:
+
 1. Drop foto ke `public/avatar.jpg`
 2. Edit **`src/components/avatar.tsx`**, ganti SVG dengan:
    ```tsx
-   import Image from 'next/image';
+   import Image from "next/image"
    export function Avatar() {
      return (
-       <div style={{ width: 72, height: 72, borderRadius: '50%', overflow: 'hidden' }}>
+       <div
+         style={{
+           width: 72,
+           height: 72,
+           borderRadius: "50%",
+           overflow: "hidden",
+         }}
+       >
          <Image src="/avatar.jpg" alt="Fahmi" width={72} height={72} />
        </div>
-     );
+     )
    }
    ```
 
@@ -206,21 +216,23 @@ Sekarang pake empty state. Untuk upgrade ke real entries:
 3. Consider add `src/app/jurnal/[slug]/page.tsx` untuk individual post pages
 
 Example data shape:
+
 ```ts
 export const entries = [
   {
-    slug: 'rag-basics',
-    title: 'RAG, tapi beneran',
-    excerpt: 'Ngoprek retrieval augmented generation...',
-    date: '2026-05-01',
-    cover: '/covers/rag.jpg', // atau gradient string
+    slug: "rag-basics",
+    title: "RAG, tapi beneran",
+    excerpt: "Ngoprek retrieval augmented generation...",
+    date: "2026-05-01",
+    cover: "/covers/rag.jpg", // atau gradient string
   },
-];
+]
 ```
 
 ### 6. Color palette
 
 Edit **`src/app/globals.css`** — semua color dikontrol via CSS variables:
+
 - `:root { ... }` untuk light mode
 - `.dark { ... }` untuk dark mode
 
@@ -229,6 +241,7 @@ Change `--bg`, `--text`, `--border`, etc., dan sisanya auto-propagate.
 ### 7. Fonts
 
 Default pake Geist Sans + Mono. Kalau mau ganti:
+
 1. Edit **`src/app/layout.tsx`** — ganti `GeistSans`/`GeistMono` import dari `next/font/google` atau `next/font/local`
 2. Update CSS variable name di `globals.css` dan `tailwind.config.mjs` kalau perlu
 
@@ -249,6 +262,7 @@ vercel
 ```
 
 Setelah deploy:
+
 1. Set custom domain `jurnal.dev` di Vercel project settings
 2. Update `metadataBase` di `layout.tsx` kalau domain beda
 
@@ -281,7 +295,7 @@ Kalau landing page ini fully static (ga ada dynamic data), bisa export ke plain 
 
 ```js
 // next.config.mjs
-export default { output: 'export' };
+export default { output: "export" }
 ```
 
 ```bash

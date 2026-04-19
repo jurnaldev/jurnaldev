@@ -34,10 +34,10 @@ Create these Content Types via **Content-Type Builder**:
 
 ### A. Tag (Collection Type)
 
-| Field | Type | Required | Notes |
-|-------|------|----------|-------|
-| `name` | Text (Short) | ✅ | Tag display name |
-| `slug` | UID | ✅ | Attached to `name` |
+| Field  | Type         | Required | Notes              |
+| ------ | ------------ | -------- | ------------------ |
+| `name` | Text (Short) | ✅       | Tag display name   |
+| `slug` | UID          | ✅       | Attached to `name` |
 
 **Internationalization**: Disabled (tags shared across locales).
 
@@ -45,12 +45,12 @@ Create these Content Types via **Content-Type Builder**:
 
 ### B. Author (Collection Type)
 
-| Field | Type | Required | Notes |
-|-------|------|----------|-------|
-| `name` | Text (Short) | ✅ | |
-| `bio` | Text (Long) | | Short bio |
-| `avatar` | Media (single) | | Profile pic |
-| `socials` | JSON | | `{ instagram, twitter, github, linkedin }` |
+| Field     | Type           | Required | Notes                                      |
+| --------- | -------------- | -------- | ------------------------------------------ |
+| `name`    | Text (Short)   | ✅       |                                            |
+| `bio`     | Text (Long)    |          | Short bio                                  |
+| `avatar`  | Media (single) |          | Profile pic                                |
+| `socials` | JSON           |          | `{ instagram, twitter, github, linkedin }` |
 
 **Internationalization**: Disabled.
 
@@ -58,21 +58,22 @@ Create these Content Types via **Content-Type Builder**:
 
 ### C. Article (Collection Type)
 
-| Field | Type | Required | Localized | Notes |
-|-------|------|----------|-----------|-------|
-| `title` | Text (Short) | ✅ | ✅ | |
-| `slug` | UID | ✅ | ✅ | Attached to `title` |
-| `excerpt` | Text (Long) | ✅ | ✅ | Max ~200 chars |
-| `body` | Rich text (Markdown) | ✅ | ✅ | Main content |
-| `cover` | Media (single) | | | Cover image, shared |
-| `entryNumber` | Number (Integer) | | | #001, #002, etc |
-| `featured` | Boolean | | | Show on landing page |
-| `tags` | Relation → Tag (many-to-many) | | | |
-| `author` | Relation → Author (many-to-one) | | | |
+| Field         | Type                            | Required | Localized | Notes                |
+| ------------- | ------------------------------- | -------- | --------- | -------------------- |
+| `title`       | Text (Short)                    | ✅       | ✅        |                      |
+| `slug`        | UID                             | ✅       | ✅        | Attached to `title`  |
+| `excerpt`     | Text (Long)                     | ✅       | ✅        | Max ~200 chars       |
+| `body`        | Rich text (Markdown)            | ✅       | ✅        | Main content         |
+| `cover`       | Media (single)                  |          |           | Cover image, shared  |
+| `entryNumber` | Number (Integer)                |          |           | #001, #002, etc      |
+| `featured`    | Boolean                         |          |           | Show on landing page |
+| `tags`        | Relation → Tag (many-to-many)   |          |           |                      |
+| `author`      | Relation → Author (many-to-one) |          |           |                      |
 
 **Internationalization**: Enable it. Fields marked ✅ "Localized" can have different values per locale. `cover`, `entryNumber`, `featured`, `tags`, `author` should be **shared** across locales (not localized).
 
 **Advanced settings**:
+
 - Set `slug` as "Unique"
 - Add `publishedAt` if not auto-added
 
@@ -83,11 +84,13 @@ Create these Content Types via **Content-Type Builder**:
 **Settings → Users & Permissions → Roles → Public**:
 
 Enable these actions:
+
 - **Article**: `find`, `findOne`
 - **Tag**: `find`, `findOne`
 - **Author**: `find`, `findOne`
 
 If you want to keep the API token-only:
+
 1. **Settings → API Tokens → Create**
 2. Name: `nextjs-frontend`
 3. Token type: `Read-only`
@@ -199,15 +202,18 @@ Restart Next.js dev server. Done — now `/jurnal` reads from Strapi.
 ## Troubleshooting
 
 **Articles not showing up?**
+
 - Check the article status is **Published** (not Draft)
 - Check Public role has `find`/`findOne` permission on Article
 - Check `NEXT_PUBLIC_STRAPI_URL` in `.env.local` matches Strapi URL
 - Restart Next.js after changing env vars
 
 **Images not loading?**
+
 - Strapi returns relative URLs (`/uploads/...`). The frontend's `strapiMediaUrl()` prepends `STRAPI_URL`. Ensure it's configured.
 - For production, configure S3/R2 upload provider so images get absolute URLs
 
 **i18n toggle broken?**
+
 - Verify locale codes match exactly: `en` and `id` (lowercase, 2 chars)
 - Verify article has been **localized** (not just duplicated) — Strapi has a dedicated "Add locale" action

@@ -13,4 +13,4 @@ export const themeScript = `
     if (resolved === 'dark') document.documentElement.classList.add('dark');
   } catch(e) {}
 })();
-`;
+`

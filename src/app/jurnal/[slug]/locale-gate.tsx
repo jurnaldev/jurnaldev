@@ -1,17 +1,19 @@
-'use client';
+"use client"
 
-import { useLang, type Lang } from '@/contexts/lang-context';
-import { type ReactNode } from 'react';
+import { useLang, type Lang } from "@/contexts/lang-context"
+import { type ReactNode } from "react"
 
 export function LocaleGate({
   locale,
   children,
 }: {
-  locale: Lang;
-  children: ReactNode;
+  locale: Lang
+  children: ReactNode
 }) {
-  const { lang } = useLang();
+  const { lang } = useLang()
   return (
-    <div style={{ display: lang === locale ? 'block' : 'none' }}>{children}</div>
-  );
+    <div style={{ display: lang === locale ? "block" : "none" }}>
+      {children}
+    </div>
+  )
 }

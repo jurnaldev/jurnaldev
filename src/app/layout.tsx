@@ -1,46 +1,46 @@
-import type { Metadata, Viewport } from 'next';
-import { GeistSans } from 'geist/font/sans';
-import { GeistMono } from 'geist/font/mono';
-import { ThemeProvider } from '@/contexts/theme-context';
-import { LangProvider } from '@/contexts/lang-context';
-import { themeScript } from '@/lib/theme-script';
-import './globals.css';
+import type { Metadata, Viewport } from "next"
+import { GeistSans } from "geist/font/sans"
+import { GeistMono } from "geist/font/mono"
+import { ThemeProvider } from "@/contexts/theme-context"
+import { LangProvider } from "@/contexts/lang-context"
+import { themeScript } from "@/lib/theme-script"
+import "./globals.css"
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://jurnal.dev'),
+  metadataBase: new URL("https://jurnal.dev"),
   title: {
-    default: 'Fahmi — jurnal.dev',
-    template: '%s · jurnal.dev',
+    default: "Fahmi — jurnal.dev",
+    template: "%s · jurnal.dev",
   },
   description:
-    'Backend engineer learning AI, out loud. A journal from the messy middle of learning something new.',
+    "Backend engineer learning AI, out loud. A journal from the messy middle of learning something new.",
   keywords: [
-    'Fahmi',
-    'Fahmi Hidayat',
-    'jurnal.dev',
-    'backend engineer',
-    'AI',
-    'software engineer',
-    'Indonesia',
-    'learning in public',
+    "Fahmi",
+    "Fahmi Hidayat",
+    "jurnal.dev",
+    "backend engineer",
+    "AI",
+    "software engineer",
+    "Indonesia",
+    "learning in public",
   ],
-  authors: [{ name: 'Fahmi Hidayat' }],
-  creator: 'Fahmi Hidayat',
+  authors: [{ name: "Fahmi Hidayat" }],
+  creator: "Fahmi Hidayat",
   openGraph: {
-    type: 'website',
-    locale: 'en_US',
-    alternateLocale: 'id_ID',
-    url: 'https://jurnal.dev',
-    siteName: 'jurnal.dev',
-    title: 'Fahmi — jurnal.dev',
+    type: "website",
+    locale: "en_US",
+    alternateLocale: "id_ID",
+    url: "https://jurnal.dev",
+    siteName: "jurnal.dev",
+    title: "Fahmi — jurnal.dev",
     description:
-      'Backend engineer learning AI, out loud. A journal from the messy middle of learning something new.',
+      "Backend engineer learning AI, out loud. A journal from the messy middle of learning something new.",
   },
   twitter: {
-    card: 'summary_large_image',
-    title: 'Fahmi — jurnal.dev',
-    description: 'Backend engineer learning AI, out loud.',
-    creator: '@DevJurnal',
+    card: "summary_large_image",
+    title: "Fahmi — jurnal.dev",
+    description: "Backend engineer learning AI, out loud.",
+    creator: "@DevJurnal",
   },
   robots: {
     index: true,
@@ -48,26 +48,30 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
   },
   icons: {
-    icon: '/favicon.ico',
+    icon: "/favicon.ico",
   },
-};
+}
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#fafaf7' },
-    { media: '(prefers-color-scheme: dark)', color: '#0a0a0a' },
+    { media: "(prefers-color-scheme: light)", color: "#fafaf7" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
   ],
-  width: 'device-width',
+  width: "device-width",
   initialScale: 1,
-};
+}
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   return (
     <html
       lang="en"
@@ -84,5 +88,5 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </ThemeProvider>
       </body>
     </html>
-  );
+  )
 }

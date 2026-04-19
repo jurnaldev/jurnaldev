@@ -1,4 +1,4 @@
-import type { StrapiArticle } from './types';
+import type { StrapiArticle } from "./types"
 
 // Mock articles — used when Strapi is offline or during initial dev.
 // Swap to real Strapi by setting NEXT_PUBLIC_STRAPI_URL & STRAPI_API_TOKEN in .env.
@@ -79,148 +79,148 @@ Minggu depan gw mau coba:
 3. Bikin agent sederhana
 
 Follow di [@jurnal.dev](https://instagram.com/jurnal.dev) buat update harian.
-`;
+`
 
 export const mockArticles: StrapiArticle[] = [
   {
     id: 1,
-    documentId: 'mock-doc-1',
-    slug: 'pertama-kali-manggil-llm',
-    title: 'Pertama kali manggil LLM dari code',
+    documentId: "mock-doc-1",
+    slug: "pertama-kali-manggil-llm",
+    title: "Pertama kali manggil LLM dari code",
     excerpt:
-      'Gw mulai serius belajar AI dari yang paling dasar: bikin first API call ke Claude.',
+      "Gw mulai serius belajar AI dari yang paling dasar: bikin first API call ke Claude.",
     body: sampleBody,
-    publishedAt: '2026-04-18T10:00:00.000Z',
-    updatedAt: '2026-04-18T10:00:00.000Z',
-    locale: 'id',
+    publishedAt: "2026-04-18T10:00:00.000Z",
+    updatedAt: "2026-04-18T10:00:00.000Z",
+    locale: "id",
     entryNumber: 1,
     featured: true,
     cover: null,
     tags: [
-      { id: 1, documentId: 'tag-1', name: 'AI', slug: 'ai' },
-      { id: 2, documentId: 'tag-2', name: 'Tutorial', slug: 'tutorial' },
+      { id: 1, documentId: "tag-1", name: "AI", slug: "ai" },
+      { id: 2, documentId: "tag-2", name: "Tutorial", slug: "tutorial" },
     ],
     author: {
       id: 1,
-      documentId: 'author-1',
-      name: 'Fahmi Hidayat',
-      bio: 'Backend engineer learning AI, out loud.',
+      documentId: "author-1",
+      name: "Fahmi Hidayat",
+      bio: "Backend engineer learning AI, out loud.",
       avatar: null,
     },
   },
   {
     id: 2,
-    documentId: 'mock-doc-2',
-    slug: 'my-first-llm-call',
-    title: 'My first LLM call, from scratch',
+    documentId: "mock-doc-2",
+    slug: "my-first-llm-call",
+    title: "My first LLM call, from scratch",
     excerpt:
       "Starting my AI journey from the absolute basics — making my first API call to Claude.",
     body: sampleBody,
-    publishedAt: '2026-04-18T10:00:00.000Z',
-    updatedAt: '2026-04-18T10:00:00.000Z',
-    locale: 'en',
+    publishedAt: "2026-04-18T10:00:00.000Z",
+    updatedAt: "2026-04-18T10:00:00.000Z",
+    locale: "en",
     entryNumber: 1,
     featured: true,
     cover: null,
     tags: [
-      { id: 1, documentId: 'tag-1', name: 'AI', slug: 'ai' },
-      { id: 2, documentId: 'tag-2', name: 'Tutorial', slug: 'tutorial' },
+      { id: 1, documentId: "tag-1", name: "AI", slug: "ai" },
+      { id: 2, documentId: "tag-2", name: "Tutorial", slug: "tutorial" },
     ],
     author: {
       id: 1,
-      documentId: 'author-1',
-      name: 'Fahmi Hidayat',
-      bio: 'Backend engineer learning AI, out loud.',
+      documentId: "author-1",
+      name: "Fahmi Hidayat",
+      bio: "Backend engineer learning AI, out loud.",
       avatar: null,
     },
   },
   {
     id: 3,
-    documentId: 'mock-doc-3',
-    slug: 'streaming-responses',
-    title: 'Streaming LLM responses tanpa ribet',
+    documentId: "mock-doc-3",
+    slug: "streaming-responses",
+    title: "Streaming LLM responses tanpa ribet",
     excerpt:
-      'Kenapa streaming response bikin UX jauh lebih hidup, dan gimana implementasinya.',
+      "Kenapa streaming response bikin UX jauh lebih hidup, dan gimana implementasinya.",
     body: sampleBody,
-    publishedAt: '2026-04-12T09:30:00.000Z',
-    updatedAt: '2026-04-12T09:30:00.000Z',
-    locale: 'id',
+    publishedAt: "2026-04-12T09:30:00.000Z",
+    updatedAt: "2026-04-12T09:30:00.000Z",
+    locale: "id",
     entryNumber: 2,
     featured: false,
     cover: null,
     tags: [
-      { id: 1, documentId: 'tag-1', name: 'AI', slug: 'ai' },
-      { id: 3, documentId: 'tag-3', name: 'UX', slug: 'ux' },
+      { id: 1, documentId: "tag-1", name: "AI", slug: "ai" },
+      { id: 3, documentId: "tag-3", name: "UX", slug: "ux" },
     ],
     author: {
       id: 1,
-      documentId: 'author-1',
-      name: 'Fahmi Hidayat',
+      documentId: "author-1",
+      name: "Fahmi Hidayat",
       avatar: null,
     },
   },
   {
     id: 4,
-    documentId: 'mock-doc-4',
-    slug: 'streaming-responses-en',
-    title: 'Streaming LLM responses, done right',
+    documentId: "mock-doc-4",
+    slug: "streaming-responses-en",
+    title: "Streaming LLM responses, done right",
     excerpt:
-      'Why streaming makes UX feel alive, and how to implement it cleanly.',
+      "Why streaming makes UX feel alive, and how to implement it cleanly.",
     body: sampleBody,
-    publishedAt: '2026-04-12T09:30:00.000Z',
-    updatedAt: '2026-04-12T09:30:00.000Z',
-    locale: 'en',
+    publishedAt: "2026-04-12T09:30:00.000Z",
+    updatedAt: "2026-04-12T09:30:00.000Z",
+    locale: "en",
     entryNumber: 2,
     featured: false,
     cover: null,
     tags: [
-      { id: 1, documentId: 'tag-1', name: 'AI', slug: 'ai' },
-      { id: 3, documentId: 'tag-3', name: 'UX', slug: 'ux' },
+      { id: 1, documentId: "tag-1", name: "AI", slug: "ai" },
+      { id: 3, documentId: "tag-3", name: "UX", slug: "ux" },
     ],
     author: {
       id: 1,
-      documentId: 'author-1',
-      name: 'Fahmi Hidayat',
+      documentId: "author-1",
+      name: "Fahmi Hidayat",
       avatar: null,
     },
   },
   {
     id: 5,
-    documentId: 'mock-doc-5',
-    slug: 'agent-pertama-gw',
-    title: 'Agent pertama gw: MCP + Claude',
+    documentId: "mock-doc-5",
+    slug: "agent-pertama-gw",
+    title: "Agent pertama gw: MCP + Claude",
     excerpt:
-      'Bikin agent sederhana yang bisa browse file system pake Model Context Protocol.',
+      "Bikin agent sederhana yang bisa browse file system pake Model Context Protocol.",
     body: sampleBody,
-    publishedAt: '2026-04-05T14:00:00.000Z',
-    updatedAt: '2026-04-05T14:00:00.000Z',
-    locale: 'id',
+    publishedAt: "2026-04-05T14:00:00.000Z",
+    updatedAt: "2026-04-05T14:00:00.000Z",
+    locale: "id",
     entryNumber: 3,
     featured: false,
     cover: null,
     tags: [
-      { id: 1, documentId: 'tag-1', name: 'AI', slug: 'ai' },
-      { id: 4, documentId: 'tag-4', name: 'MCP', slug: 'mcp' },
-      { id: 5, documentId: 'tag-5', name: 'Agents', slug: 'agents' },
+      { id: 1, documentId: "tag-1", name: "AI", slug: "ai" },
+      { id: 4, documentId: "tag-4", name: "MCP", slug: "mcp" },
+      { id: 5, documentId: "tag-5", name: "Agents", slug: "agents" },
     ],
     author: {
       id: 1,
-      documentId: 'author-1',
-      name: 'Fahmi Hidayat',
+      documentId: "author-1",
+      name: "Fahmi Hidayat",
       avatar: null,
     },
   },
-];
+]
 
-export function getMockArticles(locale: 'en' | 'id' = 'en'): StrapiArticle[] {
-  return mockArticles.filter((a) => a.locale === locale);
+export function getMockArticles(locale: "en" | "id" = "en"): StrapiArticle[] {
+  return mockArticles.filter((a) => a.locale === locale)
 }
 
 export function getMockArticleBySlug(
   slug: string,
-  locale: 'en' | 'id' = 'en',
+  locale: "en" | "id" = "en",
 ): StrapiArticle | null {
   return (
     mockArticles.find((a) => a.slug === slug && a.locale === locale) ?? null
-  );
+  )
 }
