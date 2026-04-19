@@ -1,17 +1,26 @@
-export function Avatar() {
+interface AvatarProps {
+  size?: number
+}
+
+export function Avatar({ size = 72 }: AvatarProps) {
   return (
     <div
       style={{
-        width: '72px',
-        height: '72px',
+        width: `${size}px`,
+        height: `${size}px`,
         flexShrink: 0,
-        borderRadius: '50%',
-        border: '1px solid var(--border)',
-        background: 'var(--bg-elevated)',
-        overflow: 'hidden',
+        borderRadius: "50%",
+        border: "1px solid var(--border)",
+        background: "var(--bg-elevated)",
+        overflow: "hidden",
       }}
     >
-      <svg viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg" width="72" height="72">
+      <svg
+        viewBox="0 0 72 72"
+        xmlns="http://www.w3.org/2000/svg"
+        width={size}
+        height={size}
+      >
         <circle cx="36" cy="36" r="36" fill="var(--bg-elevated)" />
         <circle
           cx="36"
@@ -49,5 +58,5 @@ export function Avatar() {
         <circle cx="36" cy="36" r="1" fill="var(--text)" />
       </svg>
     </div>
-  );
+  )
 }
