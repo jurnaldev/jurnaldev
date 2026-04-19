@@ -1,0 +1,21 @@
+# Ignore artifacts:
+build
+coverage
+
+# Ignore all HTML files:
+**/*.html
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env
+.env*.local
+.env
+
+# lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
