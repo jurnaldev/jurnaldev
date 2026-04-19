@@ -4,6 +4,8 @@ import { GeistMono } from "geist/font/mono"
 import { ThemeProvider } from "@/contexts/theme-context"
 import { LangProvider } from "@/contexts/lang-context"
 import { themeScript } from "@/lib/theme-script"
+
+// @ts-expect-error -- Next.js supports global CSS side-effect imports in app/layout.
 import "./globals.css"
 
 export const metadata: Metadata = {
