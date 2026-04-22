@@ -1,0 +1,208 @@
+/*
+ * jurnal.dev — Custom Giscus Dark Theme
+ *
+ * Matches the jurnal.dev dark mode DNA:
+ *   - Deep black bg (#0a0a0a), elevated surfaces (#111111)
+ *   - Muted text (#8a8a8a), subtle borders (#1f1f1f)
+ *   - Same monochrome, minimal aesthetic
+ */
+
+main {
+  --color-canvas-default: #0a0a0a;
+  --color-canvas-overlay: #111111;
+  --color-canvas-inset: #0d0d0d;
+  --color-canvas-subtle: #0d0d0d;
+
+  --color-border-default: #1f1f1f;
+  --color-border-muted: #1f1f1f;
+  --color-border-overlay: #1f1f1f;
+
+  --color-fg-default: #ededed;
+  --color-fg-muted: #8a8a8a;
+  --color-fg-subtle: #5a5a5a;
+
+  --color-neutral-muted: rgba(237, 237, 237, 0.08);
+  --color-neutral-subtle: rgba(237, 237, 237, 0.04);
+  --color-neutral-emphasis-plus: #ededed;
+  --color-neutral-emphasis: #8a8a8a;
+
+  --color-accent-fg: #ededed;
+  --color-accent-emphasis: #ededed;
+  --color-accent-muted: rgba(237, 237, 237, 0.15);
+  --color-accent-subtle: rgba(237, 237, 237, 0.06);
+
+  --color-primer-shadow-inset: 0 0 transparent;
+  --color-primer-shadow-focus: 0 0 0 3px rgba(237, 237, 237, 0.1);
+
+  --color-btn-text: #ededed;
+  --color-btn-bg: #111111;
+  --color-btn-border: #1f1f1f;
+  --color-btn-shadow: 0 0 transparent;
+  --color-btn-inset-shadow: 0 0 transparent;
+  --color-btn-hover-bg: #1a1a1a;
+  --color-btn-hover-border: #2a2a2a;
+  --color-btn-active-bg: #222222;
+  --color-btn-active-border: #2a2a2a;
+  --color-btn-selected-bg: #222222;
+  --color-btn-primary-text: #0a0a0a;
+  --color-btn-primary-bg: #ededed;
+  --color-btn-primary-border: #ededed;
+  --color-btn-primary-hover-bg: #ffffff;
+  --color-btn-primary-hover-border: #ffffff;
+  --color-btn-primary-selected-bg: #ededed;
+  --color-btn-primary-disabled-text: rgba(10, 10, 10, 0.5);
+  --color-btn-primary-disabled-bg: rgba(237, 237, 237, 0.5);
+
+  --color-social-reaction-bg-hover: #1a1a1a;
+  --color-social-reaction-bg-reacted-hover: rgba(237, 237, 237, 0.1);
+
+  color: #ededed;
+}
+
+/* Typography overrides — match Geist Sans/Mono */
+main,
+main .markdown-body {
+  font-family: var(--font-geist-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+  font-size: 14px;
+  line-height: 1.6;
+  letter-spacing: -0.005em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+main .markdown-body code,
+main .markdown-body pre {
+  font-family: var(--font-geist-mono, "SF Mono", "Fira Code", monospace);
+}
+
+/* Container */
+.gsc-main {
+  gap: 1rem;
+}
+
+.gsc-comment-box {
+  border: 1px solid #1f1f1f !important;
+  border-radius: 10px !important;
+  overflow: hidden;
+}
+
+.gsc-comment-box-tabs {
+  background: #0d0d0d !important;
+  border-bottom: 1px solid #1f1f1f !important;
+}
+
+.gsc-comment-box-bottom {
+  border-top: 1px solid #1f1f1f !important;
+  background: #0a0a0a !important;
+}
+
+/* Comment cards */
+.gsc-comment {
+  border: 1px solid #1f1f1f !important;
+  border-radius: 10px !important;
+  background: #0f0f0f !important;
+  padding: 1.25rem !important;
+}
+
+.gsc-comment:hover {
+  border-color: #2a2a2a !important;
+}
+
+/* Header within comments */
+.gsc-comment-header {
+  padding-bottom: 0.75rem !important;
+  border-bottom: 1px solid #1f1f1f !important;
+  margin-bottom: 0.75rem !important;
+}
+
+.gsc-comment-author {
+  font-weight: 500 !important;
+  letter-spacing: -0.01em !important;
+}
+
+/* Textarea */
+.gsc-comment-box textarea {
+  background: #111111 !important;
+  border: 1px solid #1f1f1f !important;
+  border-radius: 8px !important;
+  color: #ededed !important;
+  font-family: var(--font-geist-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif) !important;
+  font-size: 14px !important;
+}
+
+.gsc-comment-box textarea:focus {
+  border-color: #2a2a2a !important;
+  box-shadow: 0 0 0 3px rgba(237, 237, 237, 0.06) !important;
+  outline: none !important;
+}
+
+/* Buttons — inverted for dark mode */
+.gsc-comment-box .btn-primary {
+  background: #ededed !important;
+  color: #0a0a0a !important;
+  border: 1px solid #ededed !important;
+  border-radius: 6px !important;
+  font-weight: 500 !important;
+  font-size: 12px !important;
+  letter-spacing: -0.01em !important;
+  transition: all 0.15s ease !important;
+}
+
+.gsc-comment-box .btn-primary:hover {
+  background: #ffffff !important;
+  transform: translateY(-1px);
+}
+
+/* Reaction buttons */
+.gsc-direct-reaction-buttons button,
+.gsc-reactions-button {
+  border: 1px solid #1f1f1f !important;
+  border-radius: 6px !important;
+  background: #111111 !important;
+  transition: all 0.15s ease !important;
+  font-size: 12px !important;
+}
+
+.gsc-direct-reaction-buttons button:hover,
+.gsc-reactions-button:hover {
+  border-color: #2a2a2a !important;
+  background: #1a1a1a !important;
+}
+
+/* "Sign in" link */
+.gsc-comment-box-is-not-logged-in a {
+  color: #ededed !important;
+  text-decoration: underline !important;
+  text-underline-offset: 2px !important;
+}
+
+/* Reply forms */
+.gsc-reply-box {
+  border-top: 1px solid #1f1f1f !important;
+  padding-top: 1rem !important;
+}
+
+/* Pagination */
+.gsc-pagination-button {
+  border: 1px solid #1f1f1f !important;
+  border-radius: 6px !important;
+  background: #111111 !important;
+  color: #8a8a8a !important;
+  font-size: 12px !important;
+  transition: all 0.15s ease !important;
+}
+
+.gsc-pagination-button:hover {
+  border-color: #2a2a2a !important;
+  color: #ededed !important;
+}
+
+/* Timeline connector line */
+.gsc-timeline {
+  border-left-color: #1f1f1f !important;
+}
+
+/* Avatar border */
+.gsc-comment .gsc-comment-author-avatar img {
+  border: 1px solid #1f1f1f !important;
+}

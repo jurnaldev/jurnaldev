@@ -1,0 +1,209 @@
+/*
+ * jurnal.dev — Custom Giscus Light Theme
+ *
+ * Matches the jurnal.dev design DNA:
+ *   - Geist Sans / Geist Mono fonts
+ *   - Warm neutral palette (#fafaf7 bg, #0a0a0a text)
+ *   - 1px solid borders, 10px radius
+ *   - Subtle, monochrome aesthetic
+ */
+
+main {
+  --color-canvas-default: #fafaf7;
+  --color-canvas-overlay: #ffffff;
+  --color-canvas-inset: #f5f5f0;
+  --color-canvas-subtle: #f5f5f0;
+
+  --color-border-default: #e5e5e0;
+  --color-border-muted: #e5e5e0;
+  --color-border-overlay: #e5e5e0;
+
+  --color-fg-default: #0a0a0a;
+  --color-fg-muted: #666666;
+  --color-fg-subtle: #999999;
+
+  --color-neutral-muted: rgba(10, 10, 10, 0.06);
+  --color-neutral-subtle: rgba(10, 10, 10, 0.03);
+  --color-neutral-emphasis-plus: #0a0a0a;
+  --color-neutral-emphasis: #666666;
+
+  --color-accent-fg: #0a0a0a;
+  --color-accent-emphasis: #0a0a0a;
+  --color-accent-muted: rgba(10, 10, 10, 0.15);
+  --color-accent-subtle: rgba(10, 10, 10, 0.06);
+
+  --color-primer-shadow-inset: 0 0 transparent;
+  --color-primer-shadow-focus: 0 0 0 3px rgba(10, 10, 10, 0.12);
+
+  --color-btn-text: #0a0a0a;
+  --color-btn-bg: #ffffff;
+  --color-btn-border: #e5e5e0;
+  --color-btn-shadow: 0 0 transparent;
+  --color-btn-inset-shadow: 0 0 transparent;
+  --color-btn-hover-bg: #f5f5f0;
+  --color-btn-hover-border: #d0d0c8;
+  --color-btn-active-bg: #ededea;
+  --color-btn-active-border: #d0d0c8;
+  --color-btn-selected-bg: #ededea;
+  --color-btn-primary-text: #fafaf7;
+  --color-btn-primary-bg: #0a0a0a;
+  --color-btn-primary-border: #0a0a0a;
+  --color-btn-primary-hover-bg: #1a1a1a;
+  --color-btn-primary-hover-border: #1a1a1a;
+  --color-btn-primary-selected-bg: #0a0a0a;
+  --color-btn-primary-disabled-text: rgba(250, 250, 247, 0.5);
+  --color-btn-primary-disabled-bg: rgba(10, 10, 10, 0.5);
+
+  --color-social-reaction-bg-hover: #f5f5f0;
+  --color-social-reaction-bg-reacted-hover: rgba(10, 10, 10, 0.1);
+
+  color: #0a0a0a;
+}
+
+/* Typography overrides — match Geist Sans/Mono */
+main,
+main .markdown-body {
+  font-family: var(--font-geist-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+  font-size: 14px;
+  line-height: 1.6;
+  letter-spacing: -0.005em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+main .markdown-body code,
+main .markdown-body pre {
+  font-family: var(--font-geist-mono, "SF Mono", "Fira Code", monospace);
+}
+
+/* Container: remove default box shadow, match jurnal.dev cards */
+.gsc-main {
+  gap: 1rem;
+}
+
+.gsc-comment-box {
+  border: 1px solid #e5e5e0 !important;
+  border-radius: 10px !important;
+  overflow: hidden;
+}
+
+.gsc-comment-box-tabs {
+  background: #f5f5f0 !important;
+  border-bottom: 1px solid #e5e5e0 !important;
+}
+
+.gsc-comment-box-bottom {
+  border-top: 1px solid #e5e5e0 !important;
+  background: #fafaf7 !important;
+}
+
+/* Comment cards */
+.gsc-comment {
+  border: 1px solid #e5e5e0 !important;
+  border-radius: 10px !important;
+  background: #ffffff !important;
+  padding: 1.25rem !important;
+}
+
+.gsc-comment:hover {
+  border-color: #d0d0c8 !important;
+}
+
+/* Header within comments — metadata style */
+.gsc-comment-header {
+  padding-bottom: 0.75rem !important;
+  border-bottom: 1px solid #e5e5e0 !important;
+  margin-bottom: 0.75rem !important;
+}
+
+.gsc-comment-author {
+  font-weight: 500 !important;
+  letter-spacing: -0.01em !important;
+}
+
+/* Textarea */
+.gsc-comment-box textarea {
+  background: #ffffff !important;
+  border: 1px solid #e5e5e0 !important;
+  border-radius: 8px !important;
+  color: #0a0a0a !important;
+  font-family: var(--font-geist-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif) !important;
+  font-size: 14px !important;
+}
+
+.gsc-comment-box textarea:focus {
+  border-color: #d0d0c8 !important;
+  box-shadow: 0 0 0 3px rgba(10, 10, 10, 0.08) !important;
+  outline: none !important;
+}
+
+/* Buttons — match jurnal.dev pill buttons */
+.gsc-comment-box .btn-primary {
+  background: #0a0a0a !important;
+  color: #fafaf7 !important;
+  border: 1px solid #0a0a0a !important;
+  border-radius: 6px !important;
+  font-weight: 500 !important;
+  font-size: 12px !important;
+  letter-spacing: -0.01em !important;
+  transition: all 0.15s ease !important;
+}
+
+.gsc-comment-box .btn-primary:hover {
+  background: #1a1a1a !important;
+  transform: translateY(-1px);
+}
+
+/* Reaction buttons — subtle style */
+.gsc-direct-reaction-buttons button,
+.gsc-reactions-button {
+  border: 1px solid #e5e5e0 !important;
+  border-radius: 6px !important;
+  background: #ffffff !important;
+  transition: all 0.15s ease !important;
+  font-size: 12px !important;
+}
+
+.gsc-direct-reaction-buttons button:hover,
+.gsc-reactions-button:hover {
+  border-color: #d0d0c8 !important;
+  background: #f5f5f0 !important;
+}
+
+/* "Sign in" link — subtle monochrome */
+.gsc-comment-box-is-not-logged-in a {
+  color: #0a0a0a !important;
+  text-decoration: underline !important;
+  text-underline-offset: 2px !important;
+}
+
+/* Reply forms */
+.gsc-reply-box {
+  border-top: 1px solid #e5e5e0 !important;
+  padding-top: 1rem !important;
+}
+
+/* Pagination */
+.gsc-pagination-button {
+  border: 1px solid #e5e5e0 !important;
+  border-radius: 6px !important;
+  background: #ffffff !important;
+  color: #666666 !important;
+  font-size: 12px !important;
+  transition: all 0.15s ease !important;
+}
+
+.gsc-pagination-button:hover {
+  border-color: #d0d0c8 !important;
+  color: #0a0a0a !important;
+}
+
+/* Timeline connector line */
+.gsc-timeline {
+  border-left-color: #e5e5e0 !important;
+}
+
+/* Avatar border */
+.gsc-comment .gsc-comment-author-avatar img {
+  border: 1px solid #e5e5e0 !important;
+}

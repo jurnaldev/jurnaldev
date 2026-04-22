@@ -5,6 +5,7 @@ import { AuthorCard } from "@/components/article/author-card"
 import { RelatedArticles } from "@/components/article/related-articles"
 import { TableOfContents } from "@/components/article/toc"
 import { ShareButtons } from "@/components/article/share-buttons"
+import { GiscusComments } from "@/components/article/giscus-comments"
 import { PageHeader } from "@/components/page-header"
 import { LocaleGate } from "./locale-gate"
 
@@ -20,6 +21,7 @@ interface Props {
   metaId: ArticleMeta | null
   relatedEn: StrapiArticle[]
   relatedId: StrapiArticle[]
+  slug: string
 }
 
 export async function ArticleView({
@@ -29,6 +31,7 @@ export async function ArticleView({
   metaId,
   relatedEn,
   relatedId,
+  slug,
 }: Props) {
   // Pre-render both bodies on the server for SEO + static code highlighting
   const bodyEn = articleEn ? await ArticleBody({ body: articleEn.body }) : null
@@ -78,6 +81,7 @@ export async function ArticleView({
                 {relatedEn.length > 0 && (
                   <RelatedArticles articles={relatedEn} label="More entries" />
                 )}
+                <GiscusComments slug={slug} />
               </LocaleGate>
             )}
 
@@ -105,6 +109,7 @@ export async function ArticleView({
                     label="Jurnal lainnya"
                   />
                 )}
+                <GiscusComments slug={slug} />
               </LocaleGate>
             )}
 
