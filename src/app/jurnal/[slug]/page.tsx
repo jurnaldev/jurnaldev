@@ -104,6 +104,7 @@ export default async function ArticlePage({ params }: PageProps) {
       metaId={meta.id}
       relatedEn={relatedEn}
       relatedId={relatedId}
+      slug={slug}
     />
   )
 }
