@@ -6,14 +6,14 @@ import { type ReactNode } from "react"
 export function LocaleGate({
   locale,
   children,
+  inline,
 }: {
   locale: Lang
   children: ReactNode
+  inline?: boolean
 }) {
   const { lang } = useLang()
-  return (
-    <div style={{ display: lang === locale ? "block" : "none" }}>
-      {children}
-    </div>
-  )
+  const display = lang === locale ? (inline ? "inline" : "block") : "none"
+  const Tag = inline ? "span" : "div"
+  return <Tag style={{ display }}>{children}</Tag>
 }

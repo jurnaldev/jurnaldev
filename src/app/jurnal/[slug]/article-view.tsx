@@ -7,7 +7,7 @@ import { TableOfContents } from "@/components/article/toc"
 import { ShareButtons } from "@/components/article/share-buttons"
 import { GiscusComments } from "@/components/article/giscus-comments"
 import { PageHeader } from "@/components/page-header"
-import { LocaleGate } from "./locale-gate"
+import { LocaleGate } from "@/components/locale-gate"
 
 interface ArticleMeta {
   readingTime: { minutes: number; text: string }

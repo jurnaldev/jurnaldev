@@ -1,4 +1,9 @@
-import type { Locale, StrapiArticle } from "./types"
+import type {
+  Locale,
+  StrapiArticle,
+  StrapiLandingPage,
+  StrapiSocialLink,
+} from "./types"
 import * as client from "./client"
 import * as mock from "./mock"
 
@@ -77,6 +82,36 @@ export async function fetchAllSlugs(): Promise<
     return await client.getAllSlugs()
   } catch {
     return mock.mockArticles.map((a) => ({ slug: a.slug, locale: a.locale }))
+  }
+}
+
+export async function fetchLandingPage(
+  locale: Locale = "en",
+): Promise<StrapiLandingPage> {
+  if (USE_MOCK) return mock.getMockLandingPage(locale)
+
+  try {
+    return await client.getLandingPage(locale)
+  } catch (err) {
+    console.warn(
+      "[strapi] fetchLandingPage failed, falling back to mock:",
+      err,
+    )
+    return mock.getMockLandingPage(locale)
+  }
+}
+
+export async function fetchSocialLinks(): Promise<StrapiSocialLink[]> {
+  if (USE_MOCK) return mock.getMockSocialLinks()
+
+  try {
+    return await client.getSocialLinks()
+  } catch (err) {
+    console.warn(
+      "[strapi] fetchSocialLinks failed, falling back to mock:",
+      err,
+    )
+    return mock.getMockSocialLinks()
   }
 }
 
