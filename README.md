@@ -1,4 +1,4 @@
-### Fahmi Hidayat
+### Muhammad Fahmi Hidayat
 
 Backend engineer based in Jakarta. Shipping Node.js & Java services in production. Learning AI out loud.
 
@@ -25,12 +25,12 @@ things with them. I write notes from the messy middle at [jurnal.dev](https://ju
 
 #### Stack
 
-| Layer    | Tools                                  |
-| -------- | -------------------------------------- |
-| Backend  | Node.js, Java, Python                  |
-| Frontend | Next.js, React, TypeScript             |
-| AI       | Claude API, MCP, LangChain             |
-| Infra    | Docker, PostgreSQL, Redis              |
+| Layer    | Tools                      |
+| -------- | -------------------------- |
+| Backend  | Node.js, Java, Python      |
+| Frontend | Next.js, React, TypeScript |
+| AI       | Claude API, MCP, LangChain |
+| Infra    | Docker, PostgreSQL, Redis  |
 
 #### Writing
 
