@@ -1,5 +1,7 @@
 import type {
   StrapiArticle,
+  StrapiLandingPage,
+  StrapiSocialLink,
   StrapiListResponse,
   StrapiSingleResponse,
   Locale,
@@ -114,6 +116,40 @@ export async function getRelatedArticles(
   const res = await strapiFetch<StrapiListResponse<StrapiArticle>>(
     `/articles?${params.toString()}`,
     { next: { revalidate: 300 } },
+  )
+  return res.data
+}
+
+// --- Landing page queries ---
+
+export async function getLandingPage(
+  locale: Locale = "en",
+): Promise<StrapiLandingPage> {
+  const params = new URLSearchParams({
+    locale,
+    "populate[sections]": "true",
+    "populate[journalEmpty]": "true",
+    "populate[avatar]": "true",
+    "populate[seo][populate]": "ogImage",
+  })
+
+  const res = await strapiFetch<StrapiSingleResponse<StrapiLandingPage>>(
+    `/landing-page?${params.toString()}`,
+    { next: { revalidate: 60, tags: ["landing-page"] } },
+  )
+  return res.data
+}
+
+export async function getSocialLinks(): Promise<StrapiSocialLink[]> {
+  const params = new URLSearchParams({
+    "filters[enabled][$eq]": "true",
+    "sort[0]": "order:asc",
+    "pagination[limit]": "50",
+  })
+
+  const res = await strapiFetch<StrapiListResponse<StrapiSocialLink>>(
+    `/social-links?${params.toString()}`,
+    { next: { revalidate: 300, tags: ["social-links"] } },
   )
   return res.data
 }

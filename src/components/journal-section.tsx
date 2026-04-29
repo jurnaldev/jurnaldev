@@ -3,20 +3,17 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { ArrowUpRight, ArrowRight } from "lucide-react"
-import { useLang } from "@/contexts/lang-context"
-import { content } from "@/lib/content"
+import { useLang, type Lang } from "@/contexts/lang-context"
 import { ArticleCard } from "@/components/article/article-card"
-import type { StrapiArticle } from "@/lib/strapi/types"
+import type { StrapiArticle, StrapiEmptyState } from "@/lib/strapi/types"
 
-const labels = {
-  en: { viewAll: "View all entries" },
-  id: { viewAll: "Lihat semua entry" },
+interface Props {
+  emptyState: Record<Lang, StrapiEmptyState>
+  viewAllLabel: Record<Lang, string>
 }
 
-export function JournalSection() {
+export function JournalSection({ emptyState, viewAllLabel }: Props) {
   const { lang } = useLang()
-  const t = content[lang]
-  const l = labels[lang]
   const [articles, setArticles] = useState<StrapiArticle[] | null>(null)
 
   useEffect(() => {
@@ -34,12 +31,10 @@ export function JournalSection() {
     }
   }, [lang])
 
-  // Empty state
   if (articles !== null && articles.length === 0) {
-    return <EmptyState t={t} />
+    return <EmptyState empty={emptyState[lang]} />
   }
 
-  // Loading skeleton
   if (articles === null) {
     return (
       <div
@@ -87,7 +82,6 @@ export function JournalSection() {
     )
   }
 
-  // Article cards + view all link
   return (
     <>
       <div
@@ -119,14 +113,14 @@ export function JournalSection() {
           (e.currentTarget.style.color = "var(--text-muted)")
         }
       >
-        {l.viewAll}
+        {viewAllLabel[lang]}
         <ArrowRight size={14} strokeWidth={2} />
       </Link>
     </>
   )
 }
 
-function EmptyState({ t }: { t: (typeof content)["en"] }) {
+function EmptyState({ empty }: { empty: StrapiEmptyState }) {
   const gradients = [
     "var(--card-gradient-0)",
     "var(--card-gradient-1)",
@@ -218,7 +212,7 @@ function EmptyState({ t }: { t: (typeof content)["en"] }) {
               letterSpacing: "-0.01em",
             }}
           >
-            {t.journalEmpty.title}
+            {empty.title}
           </h3>
           <p
             style={{
@@ -228,32 +222,34 @@ function EmptyState({ t }: { t: (typeof content)["en"] }) {
               lineHeight: 1.6,
             }}
           >
-            {t.journalEmpty.desc}
+            {empty.desc}
           </p>
         </div>
-        <a
-          href="https://instagram.com/jurnal.dev"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="cta-button"
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "6px",
-            padding: "8px 14px",
-            background: "var(--text)",
-            color: "var(--bg)",
-            textDecoration: "none",
-            borderRadius: "6px",
-            fontSize: "13px",
-            fontWeight: 500,
-            whiteSpace: "nowrap",
-            transition: "transform 0.15s ease",
-          }}
-        >
-          {t.journalEmpty.cta}
-          <ArrowUpRight size={14} strokeWidth={2} />
-        </a>
+        {empty.cta && empty.ctaHref && (
+          <a
+            href={empty.ctaHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="cta-button"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+              padding: "8px 14px",
+              background: "var(--text)",
+              color: "var(--bg)",
+              textDecoration: "none",
+              borderRadius: "6px",
+              fontSize: "13px",
+              fontWeight: 500,
+              whiteSpace: "nowrap",
+              transition: "transform 0.15s ease",
+            }}
+          >
+            {empty.cta}
+            <ArrowUpRight size={14} strokeWidth={2} />
+          </a>
+        )}
       </div>
     </>
   )

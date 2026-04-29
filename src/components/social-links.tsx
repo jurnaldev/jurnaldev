@@ -3,29 +3,41 @@ import {
   Linkedin,
   Github,
   Twitter,
+  Mail,
+  Rss,
+  Link2,
   type LucideIcon,
 } from "lucide-react"
-import { socials } from "@/lib/content"
+import type { StrapiSocialLink, SocialIcon } from "@/lib/strapi/types"
 
-const iconMap: Record<string, LucideIcon> = {
-  Instagram,
-  LinkedIn: Linkedin,
-  GitHub: Github,
-  Twitter,
+const iconMap: Record<SocialIcon, LucideIcon> = {
+  instagram: Instagram,
+  linkedin: Linkedin,
+  github: Github,
+  twitter: Twitter,
+  email: Mail,
+  rss: Rss,
 }
 
-export function SocialLinks() {
+function pickIcon(link: StrapiSocialLink): LucideIcon {
+  if (link.icon && iconMap[link.icon]) return iconMap[link.icon]
+  const byName = link.name.toLowerCase() as SocialIcon
+  if (iconMap[byName]) return iconMap[byName]
+  return Link2
+}
+
+export function SocialLinks({ links }: { links: StrapiSocialLink[] }) {
   return (
     <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
-      {socials.map(({ name, href }) => {
-        const Icon = iconMap[name]
+      {links.map((link) => {
+        const Icon = pickIcon(link)
         return (
           <a
-            key={name}
-            href={href}
+            key={link.id}
+            href={link.href}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={name}
+            aria-label={link.name}
             className="social-link"
             style={{
               width: "44px",

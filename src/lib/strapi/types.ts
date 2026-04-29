@@ -76,3 +76,69 @@ export interface StrapiSingleResponse<T> {
   data: T
   meta: Record<string, never>
 }
+
+// --- Landing page (single type) ---
+
+export interface StrapiSectionLabels {
+  about: string
+  journal: string
+  lab: string
+  connect: string
+}
+
+export interface StrapiEmptyState {
+  title: string
+  desc: string
+  cta?: string
+  ctaHref?: string
+}
+
+export interface StrapiSeo {
+  metaTitle: string
+  metaDescription: string
+  keywords?: string
+  ogImage?: StrapiImage | null
+}
+
+export interface StrapiLandingPage {
+  id: number
+  documentId: string
+  locale: Locale
+  role: string
+  location: string
+  tagline: string
+  displayName: string
+  handle: string
+  statusDot: boolean
+  about: string // markdown
+  currentlyLabel: string
+  currentlyValue: string
+  stackLabel: string
+  stackValue: string
+  labCaption: string
+  footer: string
+  built: string
+  sections: StrapiSectionLabels
+  journalEmpty: StrapiEmptyState
+  journalViewAll: string
+  avatar?: StrapiImage | null
+  seo?: StrapiSeo | null
+}
+
+export type SocialIcon =
+  | "instagram"
+  | "linkedin"
+  | "github"
+  | "twitter"
+  | "email"
+  | "rss"
+
+export interface StrapiSocialLink {
+  id: number
+  documentId: string
+  name: string
+  href: string
+  order: number
+  enabled: boolean
+  icon?: SocialIcon | null
+}
