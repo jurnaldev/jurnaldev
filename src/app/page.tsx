@@ -9,7 +9,11 @@ import { CodeSnippet } from "@/components/code-snippet"
 import { JournalSection } from "@/components/journal-section"
 import { SocialLinks } from "@/components/social-links"
 import { LocaleGate } from "@/components/locale-gate"
-import { fetchLandingPage, fetchSocialLinks } from "@/lib/strapi"
+import {
+  fetchLandingPage,
+  fetchSocialLinks,
+  strapiMediaUrl,
+} from "@/lib/strapi"
 import type { StrapiLandingPage } from "@/lib/strapi/types"
 
 export const revalidate = 60
@@ -146,7 +150,10 @@ function Hero({ data }: { data: StrapiLandingPage }) {
           marginBottom: "2rem",
         }}
       >
-        <Avatar />
+        <Avatar
+          src={strapiMediaUrl(data.avatar?.url)}
+          alt={data.avatar?.alternativeText ?? data.displayName}
+        />
 
         <div style={{ flex: 1 }}>
           <div
