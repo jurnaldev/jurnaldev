@@ -1,6 +1,6 @@
 ### Muhammad Fahmi Hidayat
 
-Backend engineer based in Jakarta. Shipping Node.js & Java services in production. Learning AI out loud.
+Backend engineer based in Jakarta. Shipping TS Code in production. Learning AI out loud.
 
 ```text
 ROLE       Backend Engineer
