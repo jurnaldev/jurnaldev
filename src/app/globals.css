@@ -194,9 +194,13 @@ html.no-transitions *::after {
   .article-layout {
     grid-template-columns: minmax(0, 1fr) 200px;
     gap: 3rem;
+    align-items: start;
   }
   .toc-sidebar {
     order: 2;
+    position: sticky;
+    top: 2rem;
+    align-self: start;
   }
 }
 

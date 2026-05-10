@@ -45,8 +45,6 @@ export function TableOfContents({ headings }: { headings: Heading[] }) {
     <nav
       aria-label="Table of contents"
       style={{
-        position: "sticky",
-        top: "2rem",
         fontSize: "13px",
         lineHeight: 1.6,
       }}
