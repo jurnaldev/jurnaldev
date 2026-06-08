@@ -61,7 +61,7 @@ export function JournalSection({ emptyState, viewAllLabel }: Props) {
                   background: "var(--border)",
                   borderRadius: "3px",
                   marginBottom: "6px",
-                  width: "120px",
+                  width: "min(120px, 50%)",
                 }}
               />
               <div
@@ -69,7 +69,7 @@ export function JournalSection({ emptyState, viewAllLabel }: Props) {
                   height: "14px",
                   background: "var(--border)",
                   borderRadius: "3px",
-                  width: "220px",
+                  width: "min(220px, 75%)",
                 }}
               />
             </div>
@@ -91,7 +91,7 @@ export function JournalSection({ emptyState, viewAllLabel }: Props) {
     <>
       <div style={{ display: "flex", flexDirection: "column", marginBottom: "1.5rem" }}>
         {articles.map((article, i) => {
-          const readingTime = calculateReadingTime(article.body)
+          const readingTime = calculateReadingTime(article.body ?? "")
           return (
             <Link
               key={article.id}
