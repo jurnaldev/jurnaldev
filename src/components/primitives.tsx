@@ -13,26 +13,55 @@ export function SectionLabel({
     <div
       style={{
         fontFamily: "var(--font-geist-mono), monospace",
-        fontSize: "11px",
-        color: "var(--text-subtle)",
-        letterSpacing: "0.1em",
-        marginBottom: "1.5rem",
-        textTransform: "uppercase",
         display: "flex",
         alignItems: "center",
-        gap: "8px",
+        gap: "10px",
+        marginBottom: "1.5rem",
       }}
     >
-      <span>{number} /</span>
-      <span>{label}</span>
-      {Icon && <Icon size={11} strokeWidth={2} />}
+      <span
+        style={{
+          fontSize: "11px",
+          fontWeight: 500,
+          color: "var(--text-subtle)",
+          letterSpacing: "0.3px",
+          textTransform: "uppercase",
+          flexShrink: 0,
+        }}
+      >
+        {number}
+      </span>
+      <div style={{ flex: 1, height: "1px", background: "var(--border)" }} />
+      <span
+        style={{
+          fontSize: "11px",
+          fontWeight: 500,
+          color: "var(--text-subtle)",
+          letterSpacing: "0.3px",
+          textTransform: "uppercase",
+          flexShrink: 0,
+          display: "flex",
+          alignItems: "center",
+          gap: "6px",
+        }}
+      >
+        {label}
+        {Icon && <Icon size={11} strokeWidth={2} />}
+      </span>
     </div>
   )
 }
 
 export function MetaItem({ label, value }: { label: string; value: string }) {
   return (
-    <div>
+    <div
+      style={{
+        background: "var(--bg-elevated)",
+        borderRadius: "8px",
+        padding: "10px 12px",
+        boxShadow: "var(--shadow-card)",
+      }}
+    >
       <div
         style={{
           fontFamily: "var(--font-geist-mono), monospace",
