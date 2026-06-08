@@ -198,7 +198,7 @@ function Hero({ data }: { data: StrapiLandingPage }) {
       <h1
         style={{
           fontSize: "clamp(2.75rem, 7vw, 4.5rem)",
-          fontWeight: 500,
+          fontWeight: 600,
           letterSpacing: "-0.04em",
           lineHeight: 1.0,
           margin: "0 0 1.5rem 0",
@@ -267,9 +267,7 @@ function About({ data }: { data: StrapiLandingPage }) {
           marginTop: "2rem",
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-          gap: "1.5rem",
-          borderTop: "1px solid var(--border)",
-          paddingTop: "1.5rem",
+          gap: "1rem",
         }}
       >
         <MetaItem label={data.currentlyLabel} value={data.currentlyValue} />
