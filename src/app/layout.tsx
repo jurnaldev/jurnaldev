@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next"
-import Script from "next/script"
 import { GeistSans } from "geist/font/sans"
 import { GeistMono } from "geist/font/mono"
 import { ThemeProvider } from "@/contexts/theme-context"
@@ -81,9 +80,8 @@ export default function RootLayout({
       className={`${GeistSans.variable} ${GeistMono.variable}`}
     >
       <head>
-        <Script
+        <template
           id="theme-script"
-          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{ __html: themeScript }}
         />
       </head>

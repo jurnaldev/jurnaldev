@@ -3,21 +3,21 @@ export function CodeSnippet() {
     <div
       style={{
         borderRadius: "10px",
-        border: "1px solid var(--code-border)",
-        background: "var(--code-bg)",
+        border: "1px solid var(--hairline-soft)",
+        background: "var(--surface-cool)",
         overflow: "hidden",
       }}
     >
       <div
         style={{
           padding: "10px 16px",
-          borderBottom: "1px solid var(--code-border)",
+          borderBottom: "1px solid var(--hairline-soft)",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
           fontFamily: "var(--font-geist-mono), monospace",
           fontSize: "11px",
-          color: "var(--text-subtle)",
+          color: "var(--graphite)",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -27,7 +27,7 @@ export function CodeSnippet() {
                 width: "10px",
                 height: "10px",
                 borderRadius: "50%",
-                background: "var(--border-hover)",
+                background: "#ff5f57",
               }}
             />
             <span
@@ -35,7 +35,7 @@ export function CodeSnippet() {
                 width: "10px",
                 height: "10px",
                 borderRadius: "50%",
-                background: "var(--border-hover)",
+                background: "#febc2e",
               }}
             />
             <span
@@ -43,7 +43,7 @@ export function CodeSnippet() {
                 width: "10px",
                 height: "10px",
                 borderRadius: "50%",
-                background: "var(--border-hover)",
+                background: "#28c840",
               }}
             />
           </div>
@@ -59,7 +59,7 @@ export function CodeSnippet() {
           fontFamily: "var(--font-geist-mono), monospace",
           fontSize: "13px",
           lineHeight: "1.7",
-          color: "var(--text)",
+          color: "var(--ink)",
           overflowX: "auto",
         }}
       >
