@@ -27,9 +27,30 @@ export function CodeSnippet() {
       >
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <div style={{ display: "flex", gap: "6px" }}>
-            <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#ff5f57" }} />
-            <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#febc2e" }} />
-            <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#28c840" }} />
+            <span
+              style={{
+                width: "10px",
+                height: "10px",
+                borderRadius: "50%",
+                background: "#ff5f57",
+              }}
+            />
+            <span
+              style={{
+                width: "10px",
+                height: "10px",
+                borderRadius: "50%",
+                background: "#febc2e",
+              }}
+            />
+            <span
+              style={{
+                width: "10px",
+                height: "10px",
+                borderRadius: "50%",
+                background: "#28c840",
+              }}
+            />
           </div>
           <span style={{ marginLeft: "8px" }}>classify.go</span>
         </div>
@@ -65,12 +86,12 @@ export function CodeSnippet() {
           {"Model:     "}
           <span style={s("--syntax-fn")}>{"anthropic"}</span>
           {"."}
-          <span style={s("--syntax-str")}>{"ModelClaudeOpus4_8"}</span>
+          <span style={s("--syntax-str")}>{"ModelClaudeFable5"}</span>
           {","}
         </div>
         <div style={{ minHeight: L, paddingLeft: "32px" }}>
           {"MaxTokens: "}
-          <span style={s("--syntax-num")}>{"256"}</span>
+          <span style={s("--syntax-num")}>{"128"}</span>
           {","}
         </div>
         <div style={{ minHeight: L, paddingLeft: "32px" }}>
@@ -82,11 +103,17 @@ export function CodeSnippet() {
         </div>
         <div style={{ minHeight: L, paddingLeft: "48px" }}>
           {"Role: "}
+          <span style={s("--syntax-str")}>{'"system"'}</span>
+          {", Content: systemPrompt},"}
+        </div>
+        <div style={{ minHeight: L, paddingLeft: "48px" }}>
+          {"Role: "}
           <span style={s("--syntax-str")}>{'"user"'}</span>
           {", Content: body},"}
         </div>
         <div style={{ minHeight: L, paddingLeft: "32px" }}>{"}},"}</div>
         <div style={{ minHeight: L, paddingLeft: "16px" }}>{"});"}</div>
+        <div style={{ minHeight: L }} />
         <div style={{ minHeight: L }}>
           <span style={s("--syntax-key")}>{"if"}</span>
           {" err != "}

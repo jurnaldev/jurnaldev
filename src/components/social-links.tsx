@@ -1,3 +1,5 @@
+"use client"
+
 import {
   Instagram,
   Linkedin,
@@ -44,7 +46,8 @@ export function SocialLinks({ links }: { links: StrapiSocialLink[] }) {
               alignItems: "center",
               gap: "12px",
               padding: "12px 0",
-              borderBottom: i < links.length - 1 ? "1px solid var(--hairline)" : "none",
+              borderBottom:
+                i < links.length - 1 ? "1px solid var(--hairline)" : "none",
               color: "inherit",
               textDecoration: "none",
               transition: "opacity 0.15s ease",
@@ -52,7 +55,9 @@ export function SocialLinks({ links }: { links: StrapiSocialLink[] }) {
             onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.65")}
             onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
           >
-            <div style={{ color: "var(--slate)", flexShrink: 0, display: "flex" }}>
+            <div
+              style={{ color: "var(--slate)", flexShrink: 0, display: "flex" }}
+            >
               <Icon size={15} strokeWidth={1.75} />
             </div>
             <span
