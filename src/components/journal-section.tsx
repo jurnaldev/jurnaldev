@@ -2,12 +2,11 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { ArrowUpRight, ArrowRight } from "lucide-react"
 import { useLang, type Lang } from "@/contexts/lang-context"
+import { strapiMediaUrl } from "@/lib/strapi"
 import {
   formatDateShort,
   formatEntryNumber,
-  calculateReadingTime,
 } from "@/lib/article-utils"
 import type { StrapiArticle, StrapiEmptyState } from "@/lib/strapi/types"
 
@@ -48,39 +47,40 @@ export function JournalSection({ emptyState, viewAllLabel }: Props) {
             style={{
               display: "flex",
               alignItems: "center",
-              justifyContent: "space-between",
-              padding: "10px 0",
-              borderBottom: i < 2 ? "1px solid var(--border)" : "none",
+              gap: "12px",
+              padding: "12px 0",
+              borderBottom: i < 2 ? "1px solid var(--hairline)" : "none",
               opacity: 0.4,
             }}
           >
-            <div>
+            <div
+              style={{
+                width: "56px",
+                height: "38px",
+                background: "var(--hairline)",
+                borderRadius: "6px",
+                flexShrink: 0,
+              }}
+            />
+            <div style={{ flex: 1 }}>
               <div
                 style={{
-                  height: "10px",
-                  background: "var(--border)",
+                  height: "9px",
+                  background: "var(--hairline)",
                   borderRadius: "3px",
                   marginBottom: "6px",
-                  width: "min(120px, 50%)",
+                  width: "30%",
                 }}
               />
               <div
                 style={{
-                  height: "14px",
-                  background: "var(--border)",
+                  height: "13px",
+                  background: "var(--hairline)",
                   borderRadius: "3px",
-                  width: "min(220px, 75%)",
+                  width: "75%",
                 }}
               />
             </div>
-            <div
-              style={{
-                height: "22px",
-                background: "var(--border)",
-                borderRadius: "5px",
-                width: "44px",
-              }}
-            />
           </div>
         ))}
       </div>
@@ -91,18 +91,19 @@ export function JournalSection({ emptyState, viewAllLabel }: Props) {
     <>
       <div style={{ display: "flex", flexDirection: "column", marginBottom: "1.5rem" }}>
         {articles.map((article, i) => {
-          const readingTime = calculateReadingTime(article.body ?? "")
+          const coverUrl = strapiMediaUrl(article.cover?.url)
           return (
             <Link
               key={article.id}
               href={`/jurnal/${article.slug}`}
+              className="article-card-row"
               style={{
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "space-between",
-                padding: "10px 0",
+                gap: "12px",
+                padding: "12px 0",
                 borderBottom:
-                  i < articles.length - 1 ? "1px solid var(--border)" : "none",
+                  i < articles.length - 1 ? "1px solid var(--hairline)" : "none",
                 textDecoration: "none",
                 color: "inherit",
                 transition: "opacity 0.15s ease",
@@ -110,13 +111,26 @@ export function JournalSection({ emptyState, viewAllLabel }: Props) {
               onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.7")}
               onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
             >
-              <div>
+              <div
+                style={{
+                  width: "56px",
+                  height: "38px",
+                  borderRadius: "6px",
+                  flexShrink: 0,
+                  backgroundImage: coverUrl ? `url(${coverUrl})` : undefined,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                  background: coverUrl ? undefined : "var(--surface-cool)",
+                }}
+              />
+              <div style={{ flex: 1, minWidth: 0 }}>
                 <div
                   style={{
                     fontFamily: "var(--font-geist-mono), monospace",
-                    fontSize: "10px",
-                    color: "var(--text-subtle)",
-                    letterSpacing: "0.04em",
+                    fontSize: "9px",
+                    color: "var(--slate)",
+                    letterSpacing: "0.2px",
+                    textTransform: "uppercase",
                     marginBottom: "3px",
                   }}
                 >
@@ -124,30 +138,20 @@ export function JournalSection({ emptyState, viewAllLabel }: Props) {
                   {formatDateShort(article.publishedAt, article.locale)}
                 </div>
                 <div
+                  className="article-card-title"
                   style={{
-                    fontSize: "14px",
-                    fontWeight: 500,
-                    color: "var(--text)",
-                    letterSpacing: "-0.01em",
+                    fontSize: "13px",
+                    fontWeight: 400,
+                    color: "var(--ink)",
+                    letterSpacing: "-0.3px",
+                    lineHeight: 1.35,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
                   }}
                 >
                   {article.title}
                 </div>
-              </div>
-              <div
-                style={{
-                  background: "var(--bg-elevated)",
-                  borderRadius: "5px",
-                  padding: "2px 8px",
-                  boxShadow: "var(--shadow-badge)",
-                  fontFamily: "var(--font-geist-mono), monospace",
-                  fontSize: "10px",
-                  color: "var(--text-subtle)",
-                  flexShrink: 0,
-                  marginLeft: "12px",
-                }}
-              >
-                {readingTime.text}
               </div>
             </Link>
           )
@@ -160,16 +164,19 @@ export function JournalSection({ emptyState, viewAllLabel }: Props) {
           display: "inline-flex",
           alignItems: "center",
           gap: "6px",
+          padding: "6px 16px",
+          border: "1px solid var(--ink)",
+          borderRadius: "9999px",
           fontSize: "13px",
-          color: "var(--text-muted)",
+          fontWeight: 600,
+          color: "var(--ink)",
           textDecoration: "none",
-          transition: "color 0.15s ease",
+          transition: "opacity 0.15s ease",
         }}
-        onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text)")}
-        onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-muted)")}
+        onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.7")}
+        onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
       >
         {viewAllLabel[lang]}
-        <ArrowRight size={14} strokeWidth={2} />
       </Link>
     </>
   )
@@ -179,9 +186,7 @@ function EmptyState({ empty }: { empty: StrapiEmptyState }) {
   return (
     <div
       style={{
-        background: "var(--bg-elevated)",
-        border: "1px solid var(--border)",
-        borderRadius: "10px",
+        border: "1px solid var(--hairline)",
         padding: "1.5rem",
         display: "flex",
         alignItems: "center",
@@ -195,10 +200,10 @@ function EmptyState({ empty }: { empty: StrapiEmptyState }) {
         <h3
           style={{
             fontSize: "15px",
-            fontWeight: 500,
+            fontWeight: 400,
             margin: "0 0 6px 0",
-            color: "var(--text)",
-            letterSpacing: "-0.01em",
+            color: "var(--ink)",
+            letterSpacing: "-0.3px",
           }}
         >
           {empty.title}
@@ -206,7 +211,7 @@ function EmptyState({ empty }: { empty: StrapiEmptyState }) {
         <p
           style={{
             fontSize: "13px",
-            color: "var(--text-muted)",
+            color: "var(--graphite)",
             margin: 0,
             lineHeight: 1.6,
           }}
@@ -224,19 +229,18 @@ function EmptyState({ empty }: { empty: StrapiEmptyState }) {
             display: "inline-flex",
             alignItems: "center",
             gap: "6px",
-            padding: "8px 14px",
-            background: "var(--text)",
-            color: "var(--bg)",
+            padding: "8px 16px",
+            background: "var(--primary)",
+            color: "var(--on-primary)",
             textDecoration: "none",
-            borderRadius: "6px",
+            borderRadius: "9999px",
             fontSize: "13px",
-            fontWeight: 500,
+            fontWeight: 600,
             whiteSpace: "nowrap",
             transition: "transform 0.15s ease",
           }}
         >
           {empty.cta}
-          <ArrowUpRight size={14} strokeWidth={2} />
         </a>
       )}
     </div>
