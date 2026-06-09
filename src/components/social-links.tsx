@@ -42,15 +42,15 @@ export function SocialLinks({ links }: { links: StrapiSocialLink[] }) {
             style={{
               width: "44px",
               height: "44px",
-              border: "1px solid var(--border)",
+              border: "1px solid var(--hairline)",
               borderRadius: "8px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              color: "var(--text-muted)",
+              color: "var(--slate)",
               textDecoration: "none",
               transition: "all 0.15s ease",
-              background: "var(--bg-elevated)",
+              background: "var(--canvas)",
             }}
           >
             <Icon size={18} strokeWidth={1.75} />
