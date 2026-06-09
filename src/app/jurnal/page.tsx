@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from "react"
 import { useLang } from "@/contexts/lang-context"
-import { PageHeader } from "@/components/page-header"
+import { SiteHeader } from "@/components/layout/site-header"
 import { ArticleCard } from "@/components/article/article-card"
 import type { StrapiArticle } from "@/lib/strapi/types"
 
 const copy = {
   en: {
-    kicker: "Journal",
+    eyebrow: "Journal",
     title: "Notes from learning.",
     subtitle:
       "A running log of what I'm learning as a backend engineer exploring AI. Unpolished, honest, mine.",
@@ -16,7 +16,7 @@ const copy = {
     count: (n: number) => `${n} ${n === 1 ? "entry" : "entries"}`,
   },
   id: {
-    kicker: "Jurnal",
+    eyebrow: "Jurnal",
     title: "Catatan dari proses belajar.",
     subtitle:
       "Log berjalan dari apa yang gw pelajarin sebagai backend engineer yang lagi eksplor AI. Mentah, jujur, milik gw.",
@@ -37,18 +37,12 @@ export default function JurnalListPage() {
       .then((data) => {
         if (mounted) setArticles(data.articles ?? [])
       })
-      .catch(() => {
-        if (mounted) setArticles([])
-      })
-    return () => {
-      mounted = false
-    }
+      .catch(() => { mounted = false })
+    return () => { mounted = false }
   }, [lang])
 
   return (
-    <main style={{ minHeight: "100vh", position: "relative" }}>
-      <div className="grid-overlay" />
-
+    <main className="page-enter" style={{ minHeight: "100dvh", position: "relative" }}>
       <div
         style={{
           position: "relative",
@@ -58,90 +52,89 @@ export default function JurnalListPage() {
           padding: "2rem 1.5rem 4rem",
         }}
       >
-        <PageHeader />
+        <SiteHeader />
 
-        {/* Hero */}
-        <section style={{ marginBottom: "4rem" }}>
+        <section style={{ marginBottom: "3rem" }}>
           <div
             style={{
-              fontFamily: "var(--font-geist-mono), monospace",
               fontSize: "11px",
-              color: "var(--text-subtle)",
-              letterSpacing: "0.1em",
-              marginBottom: "1rem",
+              fontWeight: 500,
+              color: "var(--slate)",
+              letterSpacing: "0.35px",
               textTransform: "uppercase",
+              marginBottom: "8px",
             }}
           >
-            ◆ {t.kicker}
+            {t.eyebrow}
           </div>
           <h1
             style={{
-              fontSize: "clamp(2.25rem, 5vw, 3rem)",
-              fontWeight: 500,
-              letterSpacing: "-0.03em",
-              lineHeight: 1.1,
-              margin: "0 0 1rem 0",
-              color: "var(--text)",
+              fontSize: "clamp(2rem, 5vw, 2.75rem)",
+              fontWeight: 400,
+              letterSpacing: "-1px",
+              lineHeight: 1.05,
+              margin: "0 0 0.75rem 0",
+              color: "var(--ink)",
             }}
           >
             {t.title}
           </h1>
           <p
             style={{
-              fontSize: "1.125rem",
-              lineHeight: 1.55,
-              color: "var(--text-muted)",
+              fontSize: "1rem",
+              lineHeight: 1.5,
+              color: "var(--graphite)",
               margin: 0,
-              maxWidth: "580px",
-              letterSpacing: "-0.005em",
+              maxWidth: "540px",
             }}
           >
             {t.subtitle}
           </p>
         </section>
 
-        {/* Count */}
-        {articles && articles.length > 0 && (
+        {articles !== null && articles.length > 0 && (
           <div
             style={{
               fontFamily: "var(--font-geist-mono), monospace",
               fontSize: "11px",
-              color: "var(--text-subtle)",
-              letterSpacing: "0.05em",
-              marginBottom: "1.25rem",
-              paddingBottom: "1rem",
-              borderBottom: "1px solid var(--border)",
+              color: "var(--stone)",
+              letterSpacing: "0.2px",
+              textTransform: "uppercase",
+              marginBottom: "4px",
             }}
           >
             {t.count(articles.length)}
           </div>
         )}
 
-        {/* Grid */}
+        <div style={{ height: "1px", background: "var(--hairline)" }} />
+
         {articles === null ? (
-          <LoadingGrid />
+          <LoadingList />
         ) : articles.length === 0 ? (
           <div
             style={{
               padding: "3rem 1.5rem",
               textAlign: "center",
-              color: "var(--text-muted)",
-              border: "1px dashed var(--border)",
-              borderRadius: "10px",
+              color: "var(--graphite)",
+              border: "1px solid var(--hairline)",
+              marginTop: "1rem",
             }}
           >
             {t.empty}
           </div>
         ) : (
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-              gap: "16px",
-            }}
-          >
+          <div>
             {articles.map((article, i) => (
-              <ArticleCard key={article.id} article={article} index={i} />
+              <div
+                key={article.id}
+                style={{
+                  borderBottom:
+                    i < articles.length - 1 ? "1px solid var(--hairline)" : "none",
+                }}
+              >
+                <ArticleCard article={article} index={i} />
+              </div>
             ))}
           </div>
         )}
@@ -150,50 +143,53 @@ export default function JurnalListPage() {
   )
 }
 
-function LoadingGrid() {
+function LoadingList() {
   return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-        gap: "16px",
-      }}
-    >
+    <div>
       {[0, 1, 2].map((i) => (
         <div
           key={i}
           style={{
-            borderRadius: "10px",
-            border: "1px solid var(--border)",
-            background: "var(--bg-card)",
-            overflow: "hidden",
-            opacity: 0.5,
+            display: "flex",
+            gap: "14px",
+            alignItems: "flex-start",
+            padding: "14px 0",
+            borderBottom: i < 2 ? "1px solid var(--hairline)" : "none",
+            opacity: 0.4,
           }}
         >
-          <div style={{ height: "140px", background: "var(--border)" }} />
-          <div style={{ padding: "16px 18px" }}>
+          <div
+            style={{
+              width: "80px",
+              height: "54px",
+              background: "var(--hairline)",
+              borderRadius: "6px",
+              flexShrink: 0,
+            }}
+          />
+          <div style={{ flex: 1 }}>
             <div
               style={{
-                height: "10px",
-                background: "var(--border)",
+                height: "9px",
+                background: "var(--hairline)",
                 borderRadius: "3px",
-                marginBottom: "10px",
-                width: "40%",
+                marginBottom: "8px",
+                width: "35%",
               }}
             />
             <div
               style={{
                 height: "14px",
-                background: "var(--border)",
+                background: "var(--hairline)",
                 borderRadius: "3px",
-                marginBottom: "8px",
-                width: "85%",
+                marginBottom: "6px",
+                width: "80%",
               }}
             />
             <div
               style={{
-                height: "10px",
-                background: "var(--border)",
+                height: "12px",
+                background: "var(--hairline)",
                 borderRadius: "3px",
                 width: "60%",
               }}

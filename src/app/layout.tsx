@@ -80,8 +80,10 @@ export default function RootLayout({
       className={`${GeistSans.variable} ${GeistMono.variable}`}
     >
       <head>
-        {/* Inline script to set theme class before hydration — prevents flash */}
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <template
+          id="theme-script"
+          dangerouslySetInnerHTML={{ __html: themeScript }}
+        />
       </head>
       <body>
         <ThemeProvider>

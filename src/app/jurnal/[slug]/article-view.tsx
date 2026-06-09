@@ -6,7 +6,7 @@ import { RelatedArticles } from "@/components/article/related-articles"
 import { TableOfContents } from "@/components/article/toc"
 import { ShareButtons } from "@/components/article/share-buttons"
 import { GiscusComments } from "@/components/article/giscus-comments"
-import { PageHeader } from "@/components/page-header"
+import { SiteHeader } from "@/components/layout/site-header"
 import { LocaleGate } from "@/components/locale-gate"
 
 interface ArticleMeta {
@@ -43,9 +43,7 @@ export async function ArticleView({
       : `https://jurnal.dev/jurnal/${(articleEn || articleId)?.slug}`
 
   return (
-    <main style={{ minHeight: "100vh", position: "relative" }}>
-      <div className="grid-overlay" />
-
+    <main className="page-enter" style={{ minHeight: "100vh", position: "relative" }}>
       <div
         style={{
           position: "relative",
@@ -55,7 +53,7 @@ export async function ArticleView({
           padding: "2rem 1.5rem 4rem",
         }}
       >
-        <PageHeader />
+        <SiteHeader />
 
         <div className="article-layout">
           {/* Main column */}
@@ -70,7 +68,7 @@ export async function ArticleView({
                 {bodyEn}
                 <div
                   style={{
-                    borderTop: "1px solid var(--border)",
+                    borderTop: "1px solid var(--hairline)",
                     marginTop: "3rem",
                     paddingTop: "2rem",
                   }}
@@ -95,7 +93,7 @@ export async function ArticleView({
                 {bodyId}
                 <div
                   style={{
-                    borderTop: "1px solid var(--border)",
+                    borderTop: "1px solid var(--hairline)",
                     marginTop: "3rem",
                     paddingTop: "2rem",
                   }}
