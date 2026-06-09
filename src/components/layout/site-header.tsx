@@ -41,6 +41,7 @@ export function SiteHeader({ marginBottom = "3rem" }: { marginBottom?: string })
           style={{
             color: "var(--ink)",
             textDecoration: "none",
+            fontSize: "14px",
             fontWeight: 600,
             letterSpacing: "-0.3px",
             transition: "opacity 0.15s ease",
