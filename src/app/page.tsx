@@ -30,8 +30,6 @@ export default async function Home() {
 
   return (
     <main style={{ minHeight: "100dvh", position: "relative" }}>
-      <div className="grid-overlay" />
-
       <div
         style={{
           position: "relative",
