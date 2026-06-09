@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { ImageOff } from "lucide-react"
 import type { StrapiArticle } from "@/lib/strapi/types"
 import {
   formatDateShort,
@@ -34,18 +35,36 @@ export function ArticleCard({
       onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
     >
       {/* Thumbnail */}
-      <div
-        style={{
-          width: "80px",
-          height: "54px",
-          borderRadius: "6px",
-          flexShrink: 0,
-          backgroundImage: coverUrl ? `url(${coverUrl})` : undefined,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          background: coverUrl ? undefined : "var(--surface-cool)",
-        }}
-      />
+      {coverUrl ? (
+        <div
+          style={{
+            width: "80px",
+            height: "54px",
+            borderRadius: "6px",
+            flexShrink: 0,
+            backgroundImage: `url(${coverUrl})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        />
+      ) : (
+        <div
+          style={{
+            width: "80px",
+            height: "54px",
+            borderRadius: "6px",
+            flexShrink: 0,
+            background: "var(--surface-cool)",
+            border: "1px solid var(--hairline)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "var(--stone)",
+          }}
+        >
+          <ImageOff size={16} strokeWidth={1.5} />
+        </div>
+      )}
 
       {/* Text */}
       <div style={{ flex: 1, minWidth: 0 }}>

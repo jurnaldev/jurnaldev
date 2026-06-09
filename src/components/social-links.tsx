@@ -6,6 +6,7 @@ import {
   Mail,
   Rss,
   Link2,
+  ArrowUpRight,
   type LucideIcon,
 } from "lucide-react"
 import type { StrapiSocialLink, SocialIcon } from "@/lib/strapi/types"
@@ -28,8 +29,8 @@ function pickIcon(link: StrapiSocialLink): LucideIcon {
 
 export function SocialLinks({ links }: { links: StrapiSocialLink[] }) {
   return (
-    <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
-      {links.map((link) => {
+    <div>
+      {links.map((link, i) => {
         const Icon = pickIcon(link)
         return (
           <a
@@ -37,23 +38,36 @@ export function SocialLinks({ links }: { links: StrapiSocialLink[] }) {
             href={link.href}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={link.name}
-            className="social-link"
+            className="social-link-row"
             style={{
-              width: "44px",
-              height: "44px",
-              border: "1px solid var(--hairline)",
-              borderRadius: "8px",
               display: "flex",
               alignItems: "center",
-              justifyContent: "center",
-              color: "var(--slate)",
+              gap: "12px",
+              padding: "12px 0",
+              borderBottom: i < links.length - 1 ? "1px solid var(--hairline)" : "none",
+              color: "inherit",
               textDecoration: "none",
-              transition: "all 0.15s ease",
-              background: "var(--canvas)",
+              transition: "opacity 0.15s ease",
             }}
+            onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.65")}
+            onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
           >
-            <Icon size={18} strokeWidth={1.75} />
+            <div style={{ color: "var(--slate)", flexShrink: 0, display: "flex" }}>
+              <Icon size={15} strokeWidth={1.75} />
+            </div>
+            <span
+              style={{
+                fontSize: "13px",
+                fontWeight: 400,
+                color: "var(--ink)",
+                flex: 1,
+              }}
+            >
+              {link.name}
+            </span>
+            <div style={{ color: "var(--stone)", display: "flex" }}>
+              <ArrowUpRight size={14} strokeWidth={1.5} />
+            </div>
           </a>
         )
       })}

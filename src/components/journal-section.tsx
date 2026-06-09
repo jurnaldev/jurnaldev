@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import { ImageOff } from "lucide-react"
 import { useLang, type Lang } from "@/contexts/lang-context"
 import { strapiMediaUrl } from "@/lib/strapi"
 import {
@@ -111,18 +112,36 @@ export function JournalSection({ emptyState, viewAllLabel }: Props) {
               onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.7")}
               onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
             >
-              <div
-                style={{
-                  width: "56px",
-                  height: "38px",
-                  borderRadius: "6px",
-                  flexShrink: 0,
-                  backgroundImage: coverUrl ? `url(${coverUrl})` : undefined,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  background: coverUrl ? undefined : "var(--surface-cool)",
-                }}
-              />
+              {coverUrl ? (
+                <div
+                  style={{
+                    width: "56px",
+                    height: "38px",
+                    borderRadius: "6px",
+                    flexShrink: 0,
+                    backgroundImage: `url(${coverUrl})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                  }}
+                />
+              ) : (
+                <div
+                  style={{
+                    width: "56px",
+                    height: "38px",
+                    borderRadius: "6px",
+                    flexShrink: 0,
+                    background: "var(--surface-cool)",
+                    border: "1px solid var(--hairline)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "var(--stone)",
+                  }}
+                >
+                  <ImageOff size={13} strokeWidth={1.5} />
+                </div>
+              )}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div
                   style={{
