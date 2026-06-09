@@ -43,7 +43,7 @@ export async function ArticleView({
       : `https://jurnal.dev/jurnal/${(articleEn || articleId)?.slug}`
 
   return (
-    <main style={{ minHeight: "100vh", position: "relative" }}>
+    <main className="page-enter" style={{ minHeight: "100vh", position: "relative" }}>
       <div
         style={{
           position: "relative",

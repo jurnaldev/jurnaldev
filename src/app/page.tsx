@@ -29,7 +29,7 @@ export default async function Home() {
   }
 
   return (
-    <main style={{ minHeight: "100dvh", position: "relative" }}>
+    <main className="page-enter" style={{ minHeight: "100dvh", position: "relative" }}>
       <div
         style={{
           position: "relative",
