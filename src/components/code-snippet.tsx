@@ -1,4 +1,8 @@
 export function CodeSnippet() {
+  const L = "1.7em"
+  const s = (color: string) => ({ color: `var(${color})` })
+  const comment = { ...s("--syntax-comment"), fontStyle: "italic" as const }
+
   return (
     <div
       className="dark"
@@ -23,34 +27,13 @@ export function CodeSnippet() {
       >
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <div style={{ display: "flex", gap: "6px" }}>
-            <span
-              style={{
-                width: "10px",
-                height: "10px",
-                borderRadius: "50%",
-                background: "#ff5f57",
-              }}
-            />
-            <span
-              style={{
-                width: "10px",
-                height: "10px",
-                borderRadius: "50%",
-                background: "#febc2e",
-              }}
-            />
-            <span
-              style={{
-                width: "10px",
-                height: "10px",
-                borderRadius: "50%",
-                background: "#28c840",
-              }}
-            />
+            <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#ff5f57" }} />
+            <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#febc2e" }} />
+            <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#28c840" }} />
           </div>
-          <span style={{ marginLeft: "8px" }}>summarize-journal.ts</span>
+          <span style={{ marginLeft: "8px" }}>classify.go</span>
         </div>
-        <span>TypeScript</span>
+        <span>Go</span>
       </div>
 
       <pre
@@ -64,48 +47,61 @@ export function CodeSnippet() {
           overflowX: "auto",
         }}
       >
-        <div style={{ minHeight: "1.7em" }}>
-          <span style={{ color: "var(--syntax-comment)", fontStyle: "italic" }}>
-            {"// Summarize this week's journal entries"}
-          </span>
+        <div style={{ minHeight: L }}>
+          <span style={comment}>{"// Classify article tags in Go"}</span>
         </div>
-        <div style={{ minHeight: "1.7em" }}>
-          <span style={{ color: "var(--syntax-key)" }}>const</span>
-          {" summary = "}
-          <span style={{ color: "var(--syntax-key)" }}>await</span>{" "}
-          <span style={{ color: "var(--syntax-fn)" }}>anthropic</span>
-          {".messages."}
-          <span style={{ color: "var(--syntax-fn)" }}>create</span>
-          {"({"}
+        <div style={{ minHeight: L }}>
+          {"resp, err := client.Messages."}
+          <span style={s("--syntax-fn")}>{"New"}</span>
+          {"(ctx,"}
         </div>
-        <div style={{ minHeight: "1.7em", paddingLeft: "16px" }}>
-          {"model: "}
-          <span style={{ color: "var(--syntax-str)" }}>
-            &quot;claude-opus-4-7&quot;
-          </span>
+        <div style={{ minHeight: L, paddingLeft: "16px" }}>
+          <span style={s("--syntax-fn")}>{"anthropic"}</span>
+          {"."}
+          <span style={s("--syntax-fn")}>{"MessageNewParams"}</span>
+          {"{"}
+        </div>
+        <div style={{ minHeight: L, paddingLeft: "32px" }}>
+          {"Model:     "}
+          <span style={s("--syntax-fn")}>{"anthropic"}</span>
+          {"."}
+          <span style={s("--syntax-str")}>{"ModelClaudeOpus4_8"}</span>
           {","}
         </div>
-        <div style={{ minHeight: "1.7em", paddingLeft: "16px" }}>
-          {"max_tokens: "}
-          <span style={{ color: "var(--syntax-num)" }}>1024</span>
+        <div style={{ minHeight: L, paddingLeft: "32px" }}>
+          {"MaxTokens: "}
+          <span style={s("--syntax-num")}>{"256"}</span>
           {","}
         </div>
-        <div style={{ minHeight: "1.7em", paddingLeft: "16px" }}>
-          {"messages: ["}
+        <div style={{ minHeight: L, paddingLeft: "32px" }}>
+          {"Messages: []"}
+          <span style={s("--syntax-fn")}>{"anthropic"}</span>
+          {"."}
+          <span style={s("--syntax-fn")}>{"MessageParam"}</span>
+          {"{{"}
         </div>
-        <div style={{ minHeight: "1.7em", paddingLeft: "32px" }}>
-          {"{ role: "}
-          <span style={{ color: "var(--syntax-str)" }}>&quot;user&quot;</span>
-          {", content: entries },"}
+        <div style={{ minHeight: L, paddingLeft: "48px" }}>
+          {"Role: "}
+          <span style={s("--syntax-str")}>{'"user"'}</span>
+          {", Content: body},"}
         </div>
-        <div style={{ minHeight: "1.7em", paddingLeft: "16px" }}>{"],"}</div>
-        <div style={{ minHeight: "1.7em" }}>{"});"}</div>
-        <div style={{ minHeight: "1.7em" }}>&nbsp;</div>
-        <div style={{ minHeight: "1.7em" }}>
-          <span style={{ color: "var(--syntax-comment)", fontStyle: "italic" }}>
-            {"// → Weekly reflection, auto-drafted ✨"}
-          </span>
+        <div style={{ minHeight: L, paddingLeft: "32px" }}>{"}},"}</div>
+        <div style={{ minHeight: L, paddingLeft: "16px" }}>{"});"}</div>
+        <div style={{ minHeight: L }}>
+          <span style={s("--syntax-key")}>{"if"}</span>
+          {" err != "}
+          <span style={s("--syntax-key")}>{"nil"}</span>
+          {" {"}
         </div>
+        <div style={{ minHeight: L, paddingLeft: "16px" }}>
+          <span style={s("--syntax-key")}>{"return"}</span>
+          {" nil, fmt."}
+          <span style={s("--syntax-fn")}>{"Errorf"}</span>
+          {"("}
+          <span style={s("--syntax-str")}>{'"classify: %w"'}</span>
+          {", err)"}
+        </div>
+        <div style={{ minHeight: L }}>{"}"}</div>
       </pre>
     </div>
   )
