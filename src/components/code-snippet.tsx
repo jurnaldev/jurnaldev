@@ -1,6 +1,7 @@
 export function CodeSnippet() {
   return (
     <div
+      className="dark"
       style={{
         borderRadius: "10px",
         border: "1px solid var(--hairline-soft)",
