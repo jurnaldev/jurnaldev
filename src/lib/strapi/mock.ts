@@ -1,5 +1,6 @@
 import type {
   StrapiArticle,
+  StrapiProject,
   StrapiLandingPage,
   StrapiSocialLink,
   Locale,
@@ -357,4 +358,156 @@ const mockSocialLinks: StrapiSocialLink[] = [
 
 export function getMockSocialLinks(): StrapiSocialLink[] {
   return mockSocialLinks
+}
+
+// --- Project mocks ---
+
+const mockCover = {
+  id: 901,
+  url: "/mock/project-cover.svg",
+  width: 1200,
+  height: 675,
+  alternativeText: "Project cover placeholder",
+}
+
+export const mockProjects: StrapiProject[] = [
+  {
+    id: 101,
+    documentId: "mock-project-1",
+    slug: "jurnal-summarizer",
+    title: "Jurnal Summarizer",
+    excerpt:
+      "AI pipeline that digests my dev journals into weekly briefs with an LLM.",
+    body: sampleBody,
+    year: 2026,
+    status: "live",
+    stack: ["Python", "LLM", "Cron"],
+    githubUrl: "https://github.com/jurnaldev",
+    demoUrl: "https://jurnal.dev",
+    publishedAt: "2026-05-01T10:00:00.000Z",
+    updatedAt: "2026-05-01T10:00:00.000Z",
+    locale: "en",
+    cover: mockCover,
+    gallery: [mockCover, { ...mockCover, id: 902 }],
+    featured: true,
+    order: 1,
+  },
+  {
+    id: 102,
+    documentId: "mock-project-1-id",
+    slug: "jurnal-summarizer",
+    title: "Jurnal Summarizer",
+    excerpt:
+      "Pipeline AI yang ngerangkum jurnal dev gw jadi brief mingguan pake LLM.",
+    body: sampleBody,
+    year: 2026,
+    status: "live",
+    stack: ["Python", "LLM", "Cron"],
+    githubUrl: "https://github.com/jurnaldev",
+    demoUrl: "https://jurnal.dev",
+    publishedAt: "2026-05-01T10:00:00.000Z",
+    updatedAt: "2026-05-01T10:00:00.000Z",
+    locale: "id",
+    cover: mockCover,
+    gallery: [mockCover, { ...mockCover, id: 902 }],
+    featured: true,
+    order: 1,
+  },
+  {
+    id: 103,
+    documentId: "mock-project-2",
+    slug: "jurnal-dev",
+    title: "jurnal.dev",
+    excerpt:
+      "This site — bilingual dev journal built with Next.js 15 and Strapi.",
+    body: sampleBody,
+    year: 2026,
+    status: "live",
+    stack: ["Next.js", "TypeScript", "Strapi"],
+    githubUrl: "https://github.com/jurnaldev/jurnaldev",
+    demoUrl: "https://jurnal.dev",
+    publishedAt: "2026-04-20T10:00:00.000Z",
+    updatedAt: "2026-04-20T10:00:00.000Z",
+    locale: "en",
+    cover: mockCover,
+    gallery: [],
+    featured: false,
+    order: 2,
+  },
+  {
+    id: 104,
+    documentId: "mock-project-2-id",
+    slug: "jurnal-dev",
+    title: "jurnal.dev",
+    excerpt:
+      "Situs ini — jurnal dev bilingual yang dibangun pake Next.js 15 dan Strapi.",
+    body: sampleBody,
+    year: 2026,
+    status: "live",
+    stack: ["Next.js", "TypeScript", "Strapi"],
+    githubUrl: "https://github.com/jurnaldev/jurnaldev",
+    demoUrl: "https://jurnal.dev",
+    publishedAt: "2026-04-20T10:00:00.000Z",
+    updatedAt: "2026-04-20T10:00:00.000Z",
+    locale: "id",
+    cover: mockCover,
+    gallery: [],
+    featured: false,
+    order: 2,
+  },
+  {
+    id: 105,
+    documentId: "mock-project-3",
+    slug: "devlog-cli",
+    title: "devlog CLI",
+    excerpt:
+      "Terminal tool for capturing dev-journal entries straight from the shell.",
+    body: sampleBody,
+    year: 2025,
+    status: "wip",
+    stack: ["Node.js", "TypeScript"],
+    githubUrl: "https://github.com/jurnaldev",
+    demoUrl: null,
+    publishedAt: "2025-12-10T10:00:00.000Z",
+    updatedAt: "2025-12-10T10:00:00.000Z",
+    locale: "en",
+    cover: null,
+    gallery: [],
+    featured: false,
+    order: 3,
+  },
+  {
+    id: 106,
+    documentId: "mock-project-3-id",
+    slug: "devlog-cli",
+    title: "devlog CLI",
+    excerpt:
+      "Tool terminal buat nyatet entry jurnal dev langsung dari shell.",
+    body: sampleBody,
+    year: 2025,
+    status: "wip",
+    stack: ["Node.js", "TypeScript"],
+    githubUrl: "https://github.com/jurnaldev",
+    demoUrl: null,
+    publishedAt: "2025-12-10T10:00:00.000Z",
+    updatedAt: "2025-12-10T10:00:00.000Z",
+    locale: "id",
+    cover: null,
+    gallery: [],
+    featured: false,
+    order: 3,
+  },
+]
+
+export function getMockProjects(locale: Locale = "en"): StrapiProject[] {
+  return mockProjects.filter((p) => p.locale === locale)
+}
+
+export function getMockProjectBySlug(
+  slug: string,
+  locale: Locale = "en",
+): StrapiProject | null {
+  return (
+    mockProjects.find((p) => p.slug === slug && p.locale === locale) ?? null
+  )
 }
