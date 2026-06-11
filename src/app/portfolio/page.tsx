@@ -113,7 +113,9 @@ function ProjectList({
         </div>
       )}
 
-      <div style={{ height: "1px", background: "var(--hairline)" }} />
+      {projects.length > 0 && (
+        <div style={{ height: "1px", background: "var(--hairline)" }} />
+      )}
 
       {projects.length === 0 ? (
         <div
@@ -130,7 +132,12 @@ function ProjectList({
       ) : (
         <div>
           {featured && (
-            <div style={{ borderBottom: "1px solid var(--hairline)" }}>
+            <div
+              style={{
+                borderBottom:
+                  rows.length > 0 ? "1px solid var(--hairline)" : "none",
+              }}
+            >
               <FeaturedProject project={featured} label={t.featuredLabel} />
             </div>
           )}
