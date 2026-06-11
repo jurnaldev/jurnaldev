@@ -1,6 +1,7 @@
 import type {
   Locale,
   StrapiArticle,
+  StrapiProject,
   StrapiLandingPage,
   StrapiSocialLink,
 } from "./types"
@@ -82,6 +83,45 @@ export async function fetchAllSlugs(): Promise<
     return await client.getAllSlugs()
   } catch {
     return mock.mockArticles.map((a) => ({ slug: a.slug, locale: a.locale }))
+  }
+}
+
+export async function fetchProjects(
+  locale: Locale = "en",
+  options?: { limit?: number; featured?: boolean },
+): Promise<StrapiProject[]> {
+  if (USE_MOCK) {
+    let projects = mock.getMockProjects(locale)
+    if (options?.featured) projects = projects.filter((p) => p.featured)
+    if (options?.limit) projects = projects.slice(0, options.limit)
+    return projects
+  }
+
+  try {
+    return await client.getProjects(locale, options)
+  } catch (err) {
+    console.warn("[strapi] fetchProjects failed, falling back to mock:", err)
+    let projects = mock.getMockProjects(locale)
+    if (options?.featured) projects = projects.filter((p) => p.featured)
+    if (options?.limit) projects = projects.slice(0, options.limit)
+    return projects
+  }
+}
+
+export async function fetchProjectBySlug(
+  slug: string,
+  locale: Locale = "en",
+): Promise<StrapiProject | null> {
+  if (USE_MOCK) return mock.getMockProjectBySlug(slug, locale)
+
+  try {
+    return await client.getProjectBySlug(slug, locale)
+  } catch (err) {
+    console.warn(
+      "[strapi] fetchProjectBySlug failed, falling back to mock:",
+      err,
+    )
+    return mock.getMockProjectBySlug(slug, locale)
   }
 }
 
