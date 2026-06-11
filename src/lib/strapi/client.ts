@@ -1,5 +1,6 @@
 import type {
   StrapiArticle,
+  StrapiProject,
   StrapiLandingPage,
   StrapiSocialLink,
   StrapiListResponse,
@@ -118,6 +119,46 @@ export async function getRelatedArticles(
     { next: { revalidate: 300 } },
   )
   return res.data
+}
+
+// --- Project queries ---
+
+export async function getProjects(
+  locale: Locale = "en",
+  options?: { limit?: number; featured?: boolean },
+): Promise<StrapiProject[]> {
+  const params = new URLSearchParams({
+    locale,
+    "sort[0]": "order:asc",
+    "populate[cover]": "true",
+  })
+  if (options?.limit) params.set("pagination[limit]", String(options.limit))
+  if (options?.featured) params.set("filters[featured][$eq]", "true")
+
+  const res = await strapiFetch<StrapiListResponse<StrapiProject>>(
+    `/projects?${params.toString()}`,
+    { next: { revalidate: 60, tags: ["projects"] } },
+  )
+  return res.data
+}
+
+export async function getProjectBySlug(
+  slug: string,
+  locale: Locale = "en",
+): Promise<StrapiProject | null> {
+  const params = new URLSearchParams({
+    locale,
+    "filters[slug][$eq]": slug,
+    "populate[cover]": "true",
+    "populate[gallery]": "true",
+    "populate[localizations]": "true",
+  })
+
+  const res = await strapiFetch<StrapiListResponse<StrapiProject>>(
+    `/projects?${params.toString()}`,
+    { next: { revalidate: 60, tags: [`project:${slug}`] } },
+  )
+  return res.data[0] ?? null
 }
 
 // --- Landing page queries ---
