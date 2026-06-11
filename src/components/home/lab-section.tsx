@@ -5,7 +5,7 @@ import type { StrapiLandingPage } from "@/lib/strapi/types"
 export function LabSection({ data }: { data: StrapiLandingPage }) {
   return (
     <>
-      <SectionLabel number="03" label={data.sections.lab} icon={Sparkles} />
+      <SectionLabel number="04" label={data.sections.lab} icon={Sparkles} />
 
       <p
         style={{

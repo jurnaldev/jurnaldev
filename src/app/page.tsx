@@ -9,16 +9,20 @@ import { SocialLinks } from "@/components/social-links"
 import { SectionLabel } from "@/components/ui/section-label"
 import { CodeSnippet } from "@/components/code-snippet"
 import { LocaleGate } from "@/components/locale-gate"
-import { fetchLandingPage, fetchSocialLinks } from "@/lib/strapi"
+import { WorkSection } from "@/components/home/work-section"
+import { fetchLandingPage, fetchProjects, fetchSocialLinks } from "@/lib/strapi"
 
 export const revalidate = 60
 
 export default async function Home() {
-  const [enLanding, idLanding, socialLinks] = await Promise.all([
-    fetchLandingPage("en"),
-    fetchLandingPage("id"),
-    fetchSocialLinks(),
-  ])
+  const [enLanding, idLanding, socialLinks, projectsEn, projectsId] =
+    await Promise.all([
+      fetchLandingPage("en"),
+      fetchLandingPage("id"),
+      fetchSocialLinks(),
+      fetchProjects("en"),
+      fetchProjects("id"),
+    ])
 
   const emptyState = {
     en: enLanding.journalEmpty,
@@ -74,6 +78,26 @@ export default async function Home() {
           <JournalSection emptyState={emptyState} viewAllLabel={viewAllLabel} />
         </section>
 
+        {/* Selected Work */}
+        {(projectsEn.length > 0 || projectsId.length > 0) && (
+          <section data-animate="reveal" style={{ marginBottom: "5rem" }}>
+            <LocaleGate locale="en">
+              <SectionLabel number="03" label="Selected Work" />
+              <WorkSection
+                projects={projectsEn}
+                viewAllLabel="View all projects →"
+              />
+            </LocaleGate>
+            <LocaleGate locale="id">
+              <SectionLabel number="03" label="Karya Pilihan" />
+              <WorkSection
+                projects={projectsId}
+                viewAllLabel="Lihat semua project →"
+              />
+            </LocaleGate>
+          </section>
+        )}
+
         {/* Lab */}
         <section data-animate="reveal" style={{ marginBottom: "5rem" }}>
           <LocaleGate locale="en">
@@ -88,10 +112,10 @@ export default async function Home() {
         {/* Connect */}
         <section data-animate="reveal" style={{ marginBottom: "4rem" }}>
           <LocaleGate locale="en">
-            <SectionLabel number="04" label={enLanding.sections.connect} />
+            <SectionLabel number="05" label={enLanding.sections.connect} />
           </LocaleGate>
           <LocaleGate locale="id">
-            <SectionLabel number="04" label={idLanding.sections.connect} />
+            <SectionLabel number="05" label={idLanding.sections.connect} />
           </LocaleGate>
           <SocialLinks links={socialLinks} />
         </section>
