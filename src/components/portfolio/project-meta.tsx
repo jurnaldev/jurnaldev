@@ -86,7 +86,9 @@ export function ProjectMeta({
     <div style={{ borderBottom: "1px solid var(--hairline)" }}>
       <MetaRow label={labels.year}>{project.year}</MetaRow>
       <MetaRow label={labels.status}>{STATUS_LABEL[project.status]}</MetaRow>
-      <MetaRow label={labels.stack}>{project.stack.join(" · ")}</MetaRow>
+      {project.stack.length > 0 && (
+        <MetaRow label={labels.stack}>{project.stack.join(" · ")}</MetaRow>
+      )}
       {hasLinks && (
         <MetaRow label={labels.links}>
           <span

@@ -67,8 +67,8 @@ export function FeaturedProject({
           {project.excerpt}
         </span>
         <span style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
-          {project.stack.map((item) => (
-            <Tag key={item}>{item}</Tag>
+          {project.stack.map((item, i) => (
+            <Tag key={`${item}-${i}`}>{item}</Tag>
           ))}
         </span>
       </span>

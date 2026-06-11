@@ -1,7 +1,7 @@
 import { strapiMediaUrl } from "@/lib/strapi"
 import type { StrapiImage } from "@/lib/strapi/types"
 
-export function ProjectGallery({ images }: { images: StrapiImage[] }) {
+export function ProjectGallery({ images = [] }: { images?: StrapiImage[] }) {
   if (!images.length) return null
 
   return (
