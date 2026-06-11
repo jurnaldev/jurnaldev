@@ -5,6 +5,7 @@ export function CodeSnippet() {
 
   return (
     <div
+      data-animate="code-window"
       className="dark"
       style={{
         borderRadius: "10px",
@@ -52,7 +53,7 @@ export function CodeSnippet() {
               }}
             />
           </div>
-          <span style={{ marginLeft: "8px" }}>classify.go</span>
+          <span style={{ marginLeft: "8px" }}>factory.go</span>
         </div>
         <span>Go</span>
       </div>
@@ -68,67 +69,108 @@ export function CodeSnippet() {
           overflowX: "auto",
         }}
       >
-        <div style={{ minHeight: L }}>
-          <span style={comment}>{"// Classify article tags in Go"}</span>
+        <div data-animate="code-line" style={{ minHeight: L }}>
+          <span style={comment}>
+            {"// NewProvider returns the Provider implementation"}
+          </span>
         </div>
-        <div style={{ minHeight: L }}>
-          {"resp, err := client.Messages."}
-          <span style={s("--syntax-fn")}>{"New"}</span>
-          {"(ctx,"}
+        <div data-animate="code-line" style={{ minHeight: L }}>
+          <span style={s("--syntax-key")}>{"func"}</span>{" "}
+          <span style={s("--syntax-fn")}>{"NewProvider"}</span>
+          {"(cfg ProviderConfig, hc *http.Client) (Provider, error) {"}
         </div>
-        <div style={{ minHeight: L, paddingLeft: "16px" }}>
-          <span style={s("--syntax-fn")}>{"anthropic"}</span>
-          {"."}
-          <span style={s("--syntax-fn")}>{"MessageNewParams"}</span>
+        <div
+          data-animate="code-line"
+          style={{ minHeight: L, paddingLeft: "16px" }}
+        >
+          <span style={s("--syntax-key")}>{"switch"}</span>
+          {" cfg.Provider {"}
+        </div>
+        <div
+          data-animate="code-line"
+          style={{ minHeight: L, paddingLeft: "16px" }}
+        >
+          <span style={s("--syntax-key")}>{"case"}</span>{" "}
+          <span style={s("--syntax-str")}>{'"anthropic"'}</span>
+          {":"}
+        </div>
+        <div
+          data-animate="code-line"
+          style={{ minHeight: L, paddingLeft: "32px" }}
+        >
+          <span style={s("--syntax-key")}>{"return"}</span>{" "}
+          <span style={s("--syntax-fn")}>{"NewAnthropic"}</span>
+          {"("}
+          <span style={s("--syntax-fn")}>{"AnthropicConfig"}</span>
           {"{"}
         </div>
-        <div style={{ minHeight: L, paddingLeft: "32px" }}>
-          {"Model:     "}
-          <span style={s("--syntax-fn")}>{"anthropic"}</span>
-          {"."}
-          <span style={s("--syntax-str")}>{"ModelClaudeFable5"}</span>
-          {","}
+        <div
+          data-animate="code-line"
+          style={{ minHeight: L, paddingLeft: "48px" }}
+        >
+          {"APIKey: cfg.APIKey, Model: cfg.Model,"}
         </div>
-        <div style={{ minHeight: L, paddingLeft: "32px" }}>
-          {"MaxTokens: "}
-          <span style={s("--syntax-num")}>{"128"}</span>
-          {","}
+        <div
+          data-animate="code-line"
+          style={{ minHeight: L, paddingLeft: "48px" }}
+        >
+          {"BaseURL: cfg.BaseURL, HTTP: hc,"}
         </div>
-        <div style={{ minHeight: L, paddingLeft: "32px" }}>
-          {"Messages: []"}
-          <span style={s("--syntax-fn")}>{"anthropic"}</span>
-          {"."}
-          <span style={s("--syntax-fn")}>{"MessageParam"}</span>
-          {"{{"}
-        </div>
-        <div style={{ minHeight: L, paddingLeft: "48px" }}>
-          {"Role: "}
-          <span style={s("--syntax-str")}>{'"system"'}</span>
-          {", Content: systemPrompt},"}
-        </div>
-        <div style={{ minHeight: L, paddingLeft: "48px" }}>
-          {"Role: "}
-          <span style={s("--syntax-str")}>{'"user"'}</span>
-          {", Content: body},"}
-        </div>
-        <div style={{ minHeight: L, paddingLeft: "32px" }}>{"}},"}</div>
-        <div style={{ minHeight: L, paddingLeft: "16px" }}>{"});"}</div>
-        <div style={{ minHeight: L }} />
-        <div style={{ minHeight: L }}>
-          <span style={s("--syntax-key")}>{"if"}</span>
-          {" err != "}
+        <div
+          data-animate="code-line"
+          style={{ minHeight: L, paddingLeft: "32px" }}
+        >
+          {"}), "}
           <span style={s("--syntax-key")}>{"nil"}</span>
-          {" {"}
         </div>
-        <div style={{ minHeight: L, paddingLeft: "16px" }}>
-          <span style={s("--syntax-key")}>{"return"}</span>
-          {" nil, fmt."}
+        <div
+          data-animate="code-line"
+          style={{ minHeight: L, paddingLeft: "16px" }}
+        >
+          <span style={s("--syntax-key")}>{"case"}</span>{" "}
+          <span style={s("--syntax-str")}>{'"ollama"'}</span>
+          {":"}
+        </div>
+        <div
+          data-animate="code-line"
+          style={{ minHeight: L, paddingLeft: "32px" }}
+        >
+          <span style={s("--syntax-key")}>{"return"}</span>{" "}
+          <span style={s("--syntax-fn")}>{"NewOllama"}</span>
+          {"("}
+          <span style={s("--syntax-fn")}>{"OllamaConfig"}</span>
+          {"{Model: cfg.Model, HTTP: hc}), "}
+          <span style={s("--syntax-key")}>{"nil"}</span>
+        </div>
+        <div
+          data-animate="code-line"
+          style={{ minHeight: L, paddingLeft: "16px" }}
+        >
+          <span style={s("--syntax-key")}>{"default"}</span>
+          {":"}
+        </div>
+        <div
+          data-animate="code-line"
+          style={{ minHeight: L, paddingLeft: "32px" }}
+        >
+          <span style={s("--syntax-key")}>{"return"}</span>{" "}
+          <span style={s("--syntax-key")}>{"nil"}</span>
+          {", fmt."}
           <span style={s("--syntax-fn")}>{"Errorf"}</span>
           {"("}
-          <span style={s("--syntax-str")}>{'"classify: %w"'}</span>
-          {", err)"}
+          <span style={s("--syntax-str")}>{'"unknown llm provider %q"'}</span>
+          {", cfg.Provider)"}
         </div>
-        <div style={{ minHeight: L }}>{"}"}</div>
+        <div
+          data-animate="code-line"
+          style={{ minHeight: L, paddingLeft: "16px" }}
+        >
+          {"}"}
+        </div>
+        <div data-animate="code-line" style={{ minHeight: L }}>
+          {"}"}
+          <span data-animate="code-caret" aria-hidden="true" />
+        </div>
       </pre>
     </div>
   )

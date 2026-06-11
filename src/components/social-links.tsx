@@ -60,16 +60,18 @@ export function SocialLinks({ links }: { links: StrapiSocialLink[] }) {
             >
               <Icon size={15} strokeWidth={1.75} />
             </div>
-            <span
-              style={{
-                fontSize: "13px",
-                fontWeight: 400,
-                color: "var(--ink)",
-                flex: 1,
-              }}
-            >
-              {link.name}
-            </span>
+            <div style={{ flex: 1 }}>
+              <span
+                className="social-link-name"
+                style={{
+                  fontSize: "13px",
+                  fontWeight: 400,
+                  color: "var(--ink)",
+                }}
+              >
+                {link.name}
+              </span>
+            </div>
             <div style={{ color: "var(--stone)", display: "flex" }}>
               <ArrowUpRight size={14} strokeWidth={1.5} />
             </div>
