@@ -132,7 +132,8 @@ export async function getProjects(
     "sort[0]": "order:asc",
     "populate[cover]": "true",
   })
-  if (options?.limit) params.set("pagination[limit]", String(options.limit))
+  if (options?.limit != null)
+    params.set("pagination[limit]", String(options.limit))
   if (options?.featured) params.set("filters[featured][$eq]", "true")
 
   const res = await strapiFetch<StrapiListResponse<StrapiProject>>(

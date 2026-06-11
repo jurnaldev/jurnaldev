@@ -10,6 +10,17 @@ import * as mock from "./mock"
 
 const USE_MOCK = !process.env.NEXT_PUBLIC_STRAPI_URL
 
+function applyProjectOptions(
+  projects: StrapiProject[],
+  options?: { limit?: number; featured?: boolean },
+): StrapiProject[] {
+  let result = options?.featured
+    ? projects.filter((p) => p.featured)
+    : projects
+  if (options?.limit != null) result = result.slice(0, options.limit)
+  return result
+}
+
 export async function fetchArticles(
   locale: Locale = "en",
   options?: { limit?: number; featured?: boolean },
@@ -90,21 +101,13 @@ export async function fetchProjects(
   locale: Locale = "en",
   options?: { limit?: number; featured?: boolean },
 ): Promise<StrapiProject[]> {
-  if (USE_MOCK) {
-    let projects = mock.getMockProjects(locale)
-    if (options?.featured) projects = projects.filter((p) => p.featured)
-    if (options?.limit) projects = projects.slice(0, options.limit)
-    return projects
-  }
+  if (USE_MOCK) return applyProjectOptions(mock.getMockProjects(locale), options)
 
   try {
     return await client.getProjects(locale, options)
   } catch (err) {
     console.warn("[strapi] fetchProjects failed, falling back to mock:", err)
-    let projects = mock.getMockProjects(locale)
-    if (options?.featured) projects = projects.filter((p) => p.featured)
-    if (options?.limit) projects = projects.slice(0, options.limit)
-    return projects
+    return applyProjectOptions(mock.getMockProjects(locale), options)
   }
 }
 
