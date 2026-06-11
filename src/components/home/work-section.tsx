@@ -4,7 +4,11 @@ import { ProjectRow } from "@/components/portfolio/project-row"
 
 function topProjects(projects: StrapiProject[], n = 3): StrapiProject[] {
   return [...projects]
-    .sort((a, b) => Number(b.featured ?? false) - Number(a.featured ?? false))
+    .sort((a, b) => {
+      const byFeatured = Number(b.featured ?? false) - Number(a.featured ?? false)
+      if (byFeatured !== 0) return byFeatured
+      return (a.order ?? 0) - (b.order ?? 0)
+    })
     .slice(0, n)
 }
 
