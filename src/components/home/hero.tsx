@@ -6,6 +6,7 @@ export function Hero({ data }: { data: StrapiLandingPage }) {
   return (
     <>
       <div
+        data-animate="avatar"
         style={{
           display: "flex",
           alignItems: "center",
@@ -60,6 +61,7 @@ export function Hero({ data }: { data: StrapiLandingPage }) {
       </div>
 
       <h1
+        data-animate="hero-line"
         style={{
           fontSize: "clamp(2.75rem, 7vw, 4.5rem)",
           fontWeight: 400,
@@ -73,6 +75,7 @@ export function Hero({ data }: { data: StrapiLandingPage }) {
       </h1>
 
       <p
+        data-animate="hero-line"
         style={{
           fontSize: "1.25rem",
           fontWeight: 400,

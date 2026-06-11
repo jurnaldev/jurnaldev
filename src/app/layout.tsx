@@ -84,6 +84,11 @@ export default function RootLayout({
           id="theme-script"
           dangerouslySetInnerHTML={{ __html: themeScript }}
         />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: "document.documentElement.classList.add('js')",
+          }}
+        />
       </head>
       <body>
         <ThemeProvider>

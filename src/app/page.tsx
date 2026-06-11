@@ -1,4 +1,5 @@
 import { SiteHeader } from "@/components/layout/site-header"
+import { HomeAnimations } from "@/components/home/home-animations"
 import { Hero } from "@/components/home/hero"
 import { AboutSection } from "@/components/home/about-section"
 import { LabSection } from "@/components/home/lab-section"
@@ -29,7 +30,8 @@ export default async function Home() {
   }
 
   return (
-    <main className="page-enter" style={{ minHeight: "100dvh", position: "relative" }}>
+    <main style={{ minHeight: "100dvh", position: "relative" }}>
+      <HomeAnimations />
       <div
         style={{
           position: "relative",
@@ -52,7 +54,7 @@ export default async function Home() {
         </section>
 
         {/* About */}
-        <section style={{ marginBottom: "5rem" }}>
+        <section data-animate="reveal" style={{ marginBottom: "5rem" }}>
           <LocaleGate locale="en">
             <AboutSection data={enLanding} />
           </LocaleGate>
@@ -62,7 +64,7 @@ export default async function Home() {
         </section>
 
         {/* Journal */}
-        <section style={{ marginBottom: "5rem" }}>
+        <section data-animate="reveal" style={{ marginBottom: "5rem" }}>
           <LocaleGate locale="en">
             <SectionLabel number="02" label={enLanding.sections.journal} />
           </LocaleGate>
@@ -73,7 +75,7 @@ export default async function Home() {
         </section>
 
         {/* Lab */}
-        <section style={{ marginBottom: "5rem" }}>
+        <section data-animate="reveal" style={{ marginBottom: "5rem" }}>
           <LocaleGate locale="en">
             <LabSection data={enLanding} />
           </LocaleGate>
@@ -84,7 +86,7 @@ export default async function Home() {
         </section>
 
         {/* Connect */}
-        <section style={{ marginBottom: "4rem" }}>
+        <section data-animate="reveal" style={{ marginBottom: "4rem" }}>
           <LocaleGate locale="en">
             <SectionLabel number="04" label={enLanding.sections.connect} />
           </LocaleGate>
@@ -94,12 +96,14 @@ export default async function Home() {
           <SocialLinks links={socialLinks} />
         </section>
 
-        <LocaleGate locale="en">
-          <HomeFooter data={enLanding} />
-        </LocaleGate>
-        <LocaleGate locale="id">
-          <HomeFooter data={idLanding} />
-        </LocaleGate>
+        <div data-animate="reveal">
+          <LocaleGate locale="en">
+            <HomeFooter data={enLanding} />
+          </LocaleGate>
+          <LocaleGate locale="id">
+            <HomeFooter data={idLanding} />
+          </LocaleGate>
+        </div>
       </div>
     </main>
   )

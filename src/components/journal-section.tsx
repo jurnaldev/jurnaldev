@@ -97,7 +97,7 @@ export function JournalSection({ emptyState, viewAllLabel }: Props) {
             <Link
               key={article.id}
               href={`/jurnal/${article.slug}`}
-              className="article-card-row"
+              className="article-card-row card-enter"
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -108,6 +108,7 @@ export function JournalSection({ emptyState, viewAllLabel }: Props) {
                 textDecoration: "none",
                 color: "inherit",
                 transition: "opacity 0.15s ease",
+                animationDelay: `${i * 60}ms`,
               }}
               onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.7")}
               onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
