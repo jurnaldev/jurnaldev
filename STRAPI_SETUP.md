@@ -217,3 +217,27 @@ Restart Next.js dev server. Done — now `/jurnal` reads from Strapi.
 
 - Verify locale codes match exactly: `en` and `id` (lowercase, 2 chars)
 - Verify article has been **localized** (not just duplicated) — Strapi has a dedicated "Add locale" action
+
+---
+
+## 10. Project collection type
+
+Create a collection type `project` (API ID: `project`, plural `projects`) with **Internationalization enabled** and **Draft & Publish on**.
+
+| Field       | Type                 | Required | Localized | Notes                                                  |
+| ----------- | -------------------- | -------- | --------- | ------------------------------------------------------ |
+| `title`     | Text (Short)         | ✅       | ✅        |                                                        |
+| `slug`      | UID                  | ✅       | ✅        | Attached to `title`. May be identical across locales   |
+| `excerpt`   | Text (Long)          | ✅       | ✅        | One-liner for list rows                                |
+| `body`      | Rich text (Markdown) | ✅       | ✅        | The case study                                         |
+| `year`      | Number (Integer)     | ✅       |           |                                                        |
+| `status`    | Enumeration          | ✅       |           | `live`, `wip`, `archived`                              |
+| `stack`     | JSON                 |          |           | String array, e.g. `["Python", "LLM"]`                 |
+| `githubUrl` | Text (Short)         |          |           | Optional                                                |
+| `demoUrl`   | Text (Short)         |          |           | Optional                                                |
+| `cover`     | Media (single)       |          |           | Optional but recommended — featured card needs it      |
+| `gallery`   | Media (multiple)     |          |           | Optional; captions from alternative text                |
+| `featured`  | Boolean              |          |           | Default `false` — drives index featured card + homepage |
+| `order`     | Number (Integer)     |          |           | Manual sort; lists sort by `order` ascending            |
+
+**Permissions**: Grant the API token `find` and `findOne` permissions on `project`.
