@@ -60,6 +60,35 @@ export interface StrapiArticle {
   entryNumber?: number // e.g., 001, 002, 003
 }
 
+export type ProjectStatus = "live" | "wip" | "archived"
+
+export interface StrapiProject {
+  id: number
+  documentId: string
+  slug: string
+  title: string
+  excerpt: string
+  body: string // Markdown case study
+  year: number
+  status: ProjectStatus
+  stack: string[] // JSON field in Strapi, e.g. ["Python", "LLM"]
+  githubUrl?: string | null
+  demoUrl?: string | null
+  publishedAt: string
+  updatedAt: string
+  locale: Locale
+  localizations?: Array<{
+    id: number
+    documentId: string
+    locale: Locale
+    slug: string
+  }>
+  cover?: StrapiImage | null
+  gallery?: StrapiImage[]
+  featured?: boolean
+  order?: number // manual curated sort (1, 2, 3...)
+}
+
 export interface StrapiListResponse<T> {
   data: T[]
   meta: {

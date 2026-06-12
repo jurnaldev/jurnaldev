@@ -7,8 +7,8 @@ import { LangToggle } from "@/components/lang-toggle"
 import { useLang } from "@/contexts/lang-context"
 
 const nav = {
-  en: { home: "Home", journal: "Journal" },
-  id: { home: "Beranda", journal: "Jurnal" },
+  en: { home: "Home", journal: "Journal", portfolio: "Portfolio" },
+  id: { home: "Beranda", journal: "Jurnal", portfolio: "Portofolio" },
 }
 
 export function SiteHeader({ marginBottom = "3rem" }: { marginBottom?: string }) {
@@ -56,6 +56,7 @@ export function SiteHeader({ marginBottom = "3rem" }: { marginBottom?: string })
           {[
             { href: "/", label: nav[lang].home },
             { href: "/jurnal", label: nav[lang].journal },
+            { href: "/portfolio", label: nav[lang].portfolio },
           ].map(({ href, label }) => {
             const active = href === "/" ? pathname === "/" : pathname?.startsWith(href)
             return (
