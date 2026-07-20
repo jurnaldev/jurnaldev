@@ -33,34 +33,40 @@ export async function generateMetadata({
   return {
     metadataBase: new URL(SITE_URL),
     title: {
-      default: "Fahmi — jurnal.dev",
+      default: "Fahmi | jurnal.dev",
       template: "%s · jurnal.dev",
     },
     description:
       "Backend engineer learning AI, out loud. A journal from the messy middle of learning something new.",
     keywords: [
       "Fahmi",
+      "Muhammad Fahmi",
       "Fahmi Hidayat",
+      "Muhammad Fahmi Hidayat",
       "jurnal.dev",
-      "backend engineer",
+      "jurnal dev",
       "AI",
+      "Senior Software Engineer",
+      "AI Engineer",
+      "backend engineer",
       "software engineer",
       "Indonesia",
+      "Indonesia software engineer",
       "learning in public",
     ],
-    authors: [{ name: "Fahmi Hidayat" }],
-    creator: "Fahmi Hidayat",
+    authors: [{ name: "Muhammad Fahmi Hidayat" }],
+    creator: "Muhammad Fahmi Hidayat",
     openGraph: {
       type: "website",
       ...openGraphLocaleSet(candidate, [...locales]),
       siteName: "jurnal.dev",
-      title: "Fahmi — jurnal.dev",
+      title: "Fahmi | jurnal.dev",
       description:
         "Backend engineer learning AI, out loud. A journal from the messy middle of learning something new.",
     },
     twitter: {
       card: "summary_large_image",
-      title: "Fahmi — jurnal.dev",
+      title: "Fahmi | jurnal.dev",
       description: "Backend engineer learning AI, out loud.",
       creator: "@DevJurnal",
     },
@@ -101,10 +107,7 @@ export default async function LocaleLayout({
       className={`${GeistSans.variable} ${GeistMono.variable}`}
     >
       <head>
-        <Script
-          id="theme-script"
-          strategy="beforeInteractive"
-        >
+        <Script id="theme-script" strategy="beforeInteractive">
           {themeScript}
         </Script>
         <Script id="js-enabled-script" strategy="beforeInteractive">
