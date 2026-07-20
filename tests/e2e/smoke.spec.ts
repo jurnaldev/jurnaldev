@@ -366,8 +366,20 @@ test("localized route tree theme and language controls navigate and update conte
   page,
 }) => {
   await page.goto("/en")
+  await page.evaluate(() => {
+    ;(
+      window as Window & { __localeDocumentSentinel?: boolean }
+    ).__localeDocumentSentinel = true
+  })
   await page.getByLabel("Switch to Bahasa Indonesia").click()
   await expect(page).toHaveURL(/\/id$/)
+  expect(
+    await page.evaluate(
+      () =>
+        (window as Window & { __localeDocumentSentinel?: boolean })
+          .__localeDocumentSentinel,
+    ),
+  ).toBeUndefined()
   await expect(page.locator("html")).toHaveAttribute("lang", "id")
   await expect(
     page.getByText("belajar AI, out loud.", { exact: true }),

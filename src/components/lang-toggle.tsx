@@ -1,6 +1,5 @@
 "use client"
 
-import Link from "next/link"
 import { usePathname } from "next/navigation"
 
 import { useLang } from "@/contexts/lang-context"
@@ -88,14 +87,14 @@ export function LangToggle({
         }
 
         return (
-          <Link
+          <a
             key={locale}
             href={targetHref}
             aria-label={`Switch to ${localeNames[locale]}`}
             style={optionStyle(false)}
           >
             {locale}
-          </Link>
+          </a>
         )
       })}
     </div>

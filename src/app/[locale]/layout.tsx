@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next"
 import { notFound } from "next/navigation"
+import Script from "next/script"
 import { GeistSans } from "geist/font/sans"
 import { GeistMono } from "geist/font/mono"
 
@@ -100,15 +101,15 @@ export default async function LocaleLayout({
       className={`${GeistSans.variable} ${GeistMono.variable}`}
     >
       <head>
-        <script
+        <Script
           id="theme-script"
-          dangerouslySetInnerHTML={{ __html: themeScript }}
-        />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: "document.documentElement.classList.add('js')",
-          }}
-        />
+          strategy="beforeInteractive"
+        >
+          {themeScript}
+        </Script>
+        <Script id="js-enabled-script" strategy="beforeInteractive">
+          {"document.documentElement.classList.add('js')"}
+        </Script>
       </head>
       <body>
         <ThemeProvider>
