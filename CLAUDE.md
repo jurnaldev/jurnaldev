@@ -33,22 +33,41 @@ Next.js 16 App Router, React 19, TypeScript strict, Tailwind CSS v4, deployed st
 
 ### Data layer: `src/lib/strapi/`
 
-- `index.ts` — public API (`fetchArticles`, `fetchArticleBySlug`, `fetchRelatedArticles`, `fetchAllSlugs`). Auto-falls back to mock if `NEXT_PUBLIC_STRAPI_URL` unset or request fails
+- `index.ts` — public API (`fetchArticles`, `fetchArticleBySlug`, `fetchRelatedArticles`, `fetchAllSlugs`). Uses mock data when `NEXT_PUBLIC_STRAPI_URL` is unset. Configured CMS failures propagate unless `STRAPI_MOCK_FALLBACK=true` explicitly enables preview/demo fallback
 - `client.ts` — REST calls to Strapi v5
 - `mock.ts` — 5 sample articles for local dev
 - `types.ts` — `StrapiArticle`, `StrapiAuthor`, `StrapiTag`, `StrapiImage`, `Locale`
 
 ### Article rendering pipeline
 
-`/jurnal/[slug]/page.tsx` (server) fetches both EN + ID article versions in parallel, computes reading time and headings, then passes pre-rendered bodies to `ArticleView`.
+`/[locale]/jurnal/[slug]/page.tsx` validates the locale and fetches only that
+localized article. It computes reading time and headings for the requested body,
+fetches related articles in the same locale, and uses Strapi localization data
+only to build a translated-slug language destination and metadata alternates.
 
-`article-view.tsx` (server async component) calls `ArticleBody` to pre-render markdown server-side (Shiki syntax highlighting runs here, zero client JS). Both locale bodies are rendered into the DOM; `LocaleGate` (client component) shows/hides via CSS `display` based on `LangContext`.
+`article-view.tsx` calls `ArticleBody` to pre-render one Markdown body server-side
+(Shiki syntax highlighting runs here, zero highlighting client JS). Project
+details follow the same single-locale fetch/render model.
 
 `article-body.tsx` custom parser splits markdown into blocks before ReactMarkdown: callouts (`:::info/warning/tip/success :::`), Instagram embeds (bare URL on own line), and regular markdown. Shiki highlights all code blocks server-side.
 
 ### i18n
 
-`LangContext` (`src/contexts/lang-context.tsx`) — client context storing `"en" | "id"`. `LocaleGate` wraps content blocks with `display: block/none`. Both locale versions are always in the DOM (SSR-friendly, no re-fetch on toggle). Browser locale auto-detects on first load.
+Public pages live under `/en` and `/id`; `params.locale` is the source of truth.
+`LangProvider` (`src/contexts/lang-context.tsx`) exposes that validated route
+locale as read-only state and may persist it after navigation, but storage never
+overrides the URL. `LangToggle` navigates instead of mutating context. General
+pages preserve page type; detail pages use the real translated slug or disable
+the unavailable locale control. There is no browser-language auto-redirect.
+
+Legacy `/`, `/jurnal`, and `/portfolio` routes permanently redirect (`308`) to
+English. Legacy detail handlers resolve both locales, prefer English on a slug
+collision, preserve query strings, and propagate CMS failures. `/api/articles`
+remains unprefixed and keeps the `/api/articles?locale=en|id` contract.
+
+Localized pages own their canonical and hreflang metadata. Sitemap, Open Graph,
+and share URLs use locale-prefixed paths. Giscus retains `mapping="specific"`
+and `term={slug}` so the migration does not rename existing discussions.
 
 ### Theme
 
@@ -79,6 +98,7 @@ interface StrapiArticle {
 ## Personal content
 
 - Personal info, taglines, about text, social links: `src/lib/content.ts`
-- SEO metadata: `src/app/layout.tsx` (`metadata` export, `metadataBase`)
+- Shared SEO metadata: `src/app/[locale]/layout.tsx`; self canonicals and
+  language alternates are owned by localized pages
 - Avatar SVG: `src/components/avatar.tsx`
 - Landing code snippet: `src/components/code-snippet.tsx`

@@ -1,15 +1,8 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 
-import {
-  buildPageAlternates,
-  openGraphLocaleSet,
-} from "@/lib/i18n/metadata"
-import {
-  isLocale,
-  projectPath,
-  type Locale,
-} from "@/lib/i18n/routing"
+import { buildPageAlternates, openGraphLocaleSet } from "@/lib/i18n/metadata"
+import { isLocale, projectPath, type Locale } from "@/lib/i18n/routing"
 import { projectUrl } from "@/lib/site"
 import { fetchProjectBySlug, strapiMediaUrl } from "@/lib/strapi"
 import type { StrapiProject } from "@/lib/strapi/types"
@@ -42,7 +35,7 @@ export async function generateMetadata({
   if (!isLocale(candidate)) notFound()
 
   const project = await fetchProjectBySlug(slug, candidate)
-  if (!project) return { title: "Not found · jurnal.dev" }
+  if (!project) notFound()
 
   const ogImage = strapiMediaUrl(project.cover?.url)
   const languages = projectLanguages(project)
@@ -98,3 +91,4 @@ export default async function ProjectPage({ params }: PageProps) {
 }
 
 export const revalidate = 60
+export const dynamic = "force-static"

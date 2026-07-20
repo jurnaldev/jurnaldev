@@ -36,9 +36,7 @@ async function expectPermanentRedirect(
 async function expectLocalizedMetadataTargets(page: Page) {
   const hrefs = await page
     .locator('link[rel="canonical"], link[rel="alternate"][hreflang]')
-    .evaluateAll((links) =>
-      links.map((link) => (link as HTMLLinkElement).href),
-    )
+    .evaluateAll((links) => links.map((link) => (link as HTMLLinkElement).href))
 
   expect(hrefs.length).toBeGreaterThan(0)
   for (const href of hrefs) {
@@ -58,9 +56,7 @@ async function expectOpenGraphLocales(
     "content",
     current,
   )
-  const alternateMeta = page.locator(
-    'meta[property="og:locale:alternate"]',
-  )
+  const alternateMeta = page.locator('meta[property="og:locale:alternate"]')
   if (hasTranslation) {
     await expect(alternateMeta).toHaveCount(1)
     await expect(alternateMeta).toHaveAttribute("content", alternate)
@@ -271,15 +267,11 @@ for (const article of [
       `https://jurnal.dev${path}`,
     )
     await expect(
-      page.locator(
-        `link[rel="alternate"][hreflang="${article.locale}"]`,
-      ),
+      page.locator(`link[rel="alternate"][hreflang="${article.locale}"]`),
     ).toHaveAttribute("href", `https://jurnal.dev${path}`)
     const alternateLocale = article.locale === "en" ? "id" : "en"
     await expect(
-      page.locator(
-        `link[rel="alternate"][hreflang="${alternateLocale}"]`,
-      ),
+      page.locator(`link[rel="alternate"][hreflang="${alternateLocale}"]`),
     ).toHaveAttribute("href", `https://jurnal.dev${article.alternateHref}`)
     await expect(page.locator('meta[property="og:url"]')).toHaveAttribute(
       "content",
@@ -328,15 +320,11 @@ for (const project of [
       `https://jurnal.dev${path}`,
     )
     await expect(
-      page.locator(
-        `link[rel="alternate"][hreflang="${project.locale}"]`,
-      ),
+      page.locator(`link[rel="alternate"][hreflang="${project.locale}"]`),
     ).toHaveAttribute("href", `https://jurnal.dev${path}`)
     const alternateLocale = project.locale === "en" ? "id" : "en"
     await expect(
-      page.locator(
-        `link[rel="alternate"][hreflang="${alternateLocale}"]`,
-      ),
+      page.locator(`link[rel="alternate"][hreflang="${alternateLocale}"]`),
     ).toHaveAttribute("href", `https://jurnal.dev${project.alternateHref}`)
     await expect(page.locator('meta[property="og:url"]')).toHaveAttribute(
       "content",
@@ -362,10 +350,7 @@ test("localized route tree disables a missing article translation", async ({
   )
   await expect(
     page.locator('link[rel="alternate"][hreflang="id"]'),
-  ).toHaveAttribute(
-    "href",
-    "https://jurnal.dev/id/jurnal/agent-pertama-gw",
-  )
+  ).toHaveAttribute("href", "https://jurnal.dev/id/jurnal/agent-pertama-gw")
   await expect(
     page.locator('link[rel="alternate"][hreflang="en"]'),
   ).toHaveCount(0)
@@ -377,24 +362,16 @@ test("localized route tree disables a missing article translation", async ({
   await expectLocalizedMetadataTargets(page)
 })
 
-for (const path of [
-  "/",
-  "/jurnal",
-  "/jurnal/my-first-llm-call",
-  "/portfolio",
-  "/portfolio/jurnal-summarizer",
-]) {
-  test(`${path} renders successfully`, async ({ page }) => {
-    const response = await page.goto(path)
-    expect(response?.status()).toBe(200)
-    await expect(page.locator("h1").first()).toBeVisible()
-  })
-}
-
-test("theme and language controls update the document", async ({ page }) => {
-  await page.goto("/")
+test("localized route tree theme and language controls navigate and update content", async ({
+  page,
+}) => {
+  await page.goto("/en")
   await page.getByLabel("Switch to Bahasa Indonesia").click()
+  await expect(page).toHaveURL(/\/id$/)
   await expect(page.locator("html")).toHaveAttribute("lang", "id")
+  await expect(
+    page.getByText("belajar AI, out loud.", { exact: true }),
+  ).toBeVisible()
   await page.getByLabel("Dark theme").click()
   await expect(page.locator("html")).toHaveClass(/dark/)
 })
@@ -426,33 +403,74 @@ test("localized route tree Indonesian share links preserve the localized slug", 
   )
 })
 
-test("journal leaves loading state and can retry after a 503", async ({
-  page,
-}) => {
-  await page.route("**/api/articles?*", (route) =>
-    route.fulfill({ status: 503, contentType: "application/json", body: "{}" }),
-  )
-  await page.goto("/jurnal")
-  await expect(
-    page.getByText("Articles are temporarily unavailable. Try again."),
-  ).toBeVisible()
-  await page.unroute("**/api/articles?*")
-  await page.getByRole("button", { name: "Try again" }).click()
-  await expect(page.locator('a[href^="/jurnal/"]').first()).toBeVisible()
-  recordedErrors(page).length = 0
-})
+for (const journal of [
+  {
+    locale: "en",
+    error: "Articles are temporarily unavailable. Try again.",
+    retry: "Try again",
+  },
+  {
+    locale: "id",
+    error: "Artikel sementara tidak tersedia. Coba lagi.",
+    retry: "Coba lagi",
+  },
+] as const) {
+  test(`localized route tree /${journal.locale}/jurnal sends its locale query and retries after a 503`, async ({
+    page,
+  }) => {
+    const requestedLocales: Array<string | null> = []
+    await page.route("**/api/articles?*", (route) => {
+      requestedLocales.push(
+        new URL(route.request().url()).searchParams.get("locale"),
+      )
+      return route.fulfill({
+        status: 503,
+        contentType: "application/json",
+        body: "{}",
+      })
+    })
 
-test("missing routes render the custom 404", async ({ page }) => {
-  const response = await page.goto("/does-not-exist")
-  expect(response?.status()).toBe(404)
-  await expect(
-    page.getByRole("heading", { name: "Page not found." }),
-  ).toBeVisible()
-  recordedErrors(page).length = 0
-})
+    await page.goto(`/${journal.locale}/jurnal`)
+    await expect(page.getByText(journal.error)).toBeVisible()
+    expect(requestedLocales).toEqual([journal.locale])
+
+    await page.unroute("**/api/articles?*")
+    await page.getByRole("button", { name: journal.retry }).click()
+    await expect(
+      page.locator(`a[href^="/${journal.locale}/jurnal/"]`).first(),
+    ).toBeVisible()
+
+    const errors = recordedErrors(page)
+    expect(errors).toEqual([
+      "Failed to load resource: the server responded with a status of 503 (Service Unavailable)",
+    ])
+    errors.splice(0)
+  })
+}
+
+for (const path of [
+  "/en/jurnal/unknown-localized-article",
+  "/id/portfolio/unknown-localized-project",
+]) {
+  test(`localized route tree ${path} returns the custom 404`, async ({
+    page,
+  }) => {
+    const response = await page.goto(path)
+    expect(response?.status()).toBe(404)
+    await expect(
+      page.getByRole("heading", { name: "Page not found." }),
+    ).toBeVisible()
+
+    const errors = recordedErrors(page)
+    expect(errors).toEqual([
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    ])
+    errors.splice(0)
+  })
+}
 
 test("production responses include the security policy", async ({ page }) => {
-  const response = await page.goto("/")
+  const response = await page.goto("/en")
   const headers = response!.headers()
   expect(headers["content-security-policy"]).toContain(
     "script-src 'self' 'unsafe-inline' https://giscus.app",

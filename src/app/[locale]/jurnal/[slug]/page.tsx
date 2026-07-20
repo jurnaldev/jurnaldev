@@ -2,15 +2,8 @@ import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 
 import { calculateReadingTime, extractHeadings } from "@/lib/article-utils"
-import {
-  buildPageAlternates,
-  openGraphLocaleSet,
-} from "@/lib/i18n/metadata"
-import {
-  articlePath,
-  isLocale,
-  type Locale,
-} from "@/lib/i18n/routing"
+import { buildPageAlternates, openGraphLocaleSet } from "@/lib/i18n/metadata"
+import { articlePath, isLocale, type Locale } from "@/lib/i18n/routing"
 import { articleUrl } from "@/lib/site"
 import {
   fetchArticleBySlug,
@@ -47,7 +40,7 @@ export async function generateMetadata({
   if (!isLocale(candidate)) notFound()
 
   const article = await fetchArticleBySlug(slug, candidate)
-  if (!article) return { title: "Not found · jurnal.dev" }
+  if (!article) notFound()
 
   const ogImage = strapiMediaUrl(article.cover?.url)
   const languages = articleLanguages(article)
@@ -94,12 +87,7 @@ export default async function ArticlePage({ params }: PageProps) {
     headings: extractHeadings(article.body, headingPrefix),
   }
   const tagIds = article.tags?.map((tag) => tag.id) ?? []
-  const related = await fetchRelatedArticles(
-    article.slug,
-    tagIds,
-    candidate,
-    3,
-  )
+  const related = await fetchRelatedArticles(article.slug, tagIds, candidate, 3)
   const alternateLocale = candidate === "en" ? "id" : "en"
   const alternate = article.localizations?.find(
     (localization) => localization.locale === alternateLocale,
@@ -120,3 +108,4 @@ export default async function ArticlePage({ params }: PageProps) {
 }
 
 export const revalidate = 60
+export const dynamic = "force-static"
