@@ -1,6 +1,8 @@
 // Strapi response types
 
-export type Locale = "en" | "id"
+import type { Locale } from "@/lib/i18n/routing"
+
+export type { Locale } from "@/lib/i18n/routing"
 
 export interface StrapiImage {
   id: number
