@@ -15,7 +15,7 @@ export default defineConfig({
     url: "http://127.0.0.1:3000/en",
     reuseExistingServer: !process.env.CI,
     env: {
-      NEXT_PUBLIC_SITE_URL: "http://127.0.0.1:3000",
+      NEXT_PUBLIC_SITE_URL: "https://jurnal.dev",
       NEXT_PUBLIC_STRAPI_URL: "",
       STRAPI_API_TOKEN: "",
       HOSTNAME: "127.0.0.1",

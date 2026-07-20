@@ -33,6 +33,42 @@ async function expectPermanentRedirect(
   expect(`${location.pathname}${location.search}`).toBe(destination)
 }
 
+async function expectLocalizedMetadataTargets(page: Page) {
+  const hrefs = await page
+    .locator('link[rel="canonical"], link[rel="alternate"][hreflang]')
+    .evaluateAll((links) =>
+      links.map((link) => (link as HTMLLinkElement).href),
+    )
+
+  expect(hrefs.length).toBeGreaterThan(0)
+  for (const href of hrefs) {
+    expect(new URL(href).pathname).toMatch(/^\/(en|id)(\/|$)/)
+  }
+}
+
+async function expectOpenGraphLocales(
+  page: Page,
+  locale: "en" | "id",
+  hasTranslation: boolean,
+) {
+  const current = locale === "en" ? "en_US" : "id_ID"
+  const alternate = locale === "en" ? "id_ID" : "en_US"
+
+  await expect(page.locator('meta[property="og:locale"]')).toHaveAttribute(
+    "content",
+    current,
+  )
+  const alternateMeta = page.locator(
+    'meta[property="og:locale:alternate"]',
+  )
+  if (hasTranslation) {
+    await expect(alternateMeta).toHaveCount(1)
+    await expect(alternateMeta).toHaveAttribute("content", alternate)
+  } else {
+    await expect(alternateMeta).toHaveCount(0)
+  }
+}
+
 test("legacy root redirect is a deterministic permanent redirect", async ({
   request,
 }) => {
@@ -103,6 +139,25 @@ for (const locale of ["en", "id"] as const) {
     expect(response.status()).toBe(200)
     expect(await response.text()).toContain(`<html lang="${locale}"`)
   })
+
+  test(`localized metadata /${locale} has self canonical and both home alternates`, async ({
+    page,
+  }) => {
+    await page.goto(`/${locale}`)
+
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+      "href",
+      `https://jurnal.dev/${locale}`,
+    )
+    await expect(
+      page.locator('link[rel="alternate"][hreflang="en"]'),
+    ).toHaveAttribute("href", "https://jurnal.dev/en")
+    await expect(
+      page.locator('link[rel="alternate"][hreflang="id"]'),
+    ).toHaveAttribute("href", "https://jurnal.dev/id")
+    await expectOpenGraphLocales(page, locale, true)
+    await expectLocalizedMetadataTargets(page)
+  })
 }
 
 for (const path of ["/fr", "/fr/jurnal"]) {
@@ -167,6 +222,8 @@ for (const listing of [
       "href",
       `https://jurnal.dev/id/${listing.alternateSection}`,
     )
+    await expectOpenGraphLocales(page, listing.locale, true)
+    await expectLocalizedMetadataTargets(page)
   })
 }
 
@@ -208,6 +265,28 @@ for (const article of [
       .getByLabel("Share on Twitter/X")
       .getAttribute("href")
     expect(decodeURIComponent(shareHref!)).toContain(path)
+
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+      "href",
+      `https://jurnal.dev${path}`,
+    )
+    await expect(
+      page.locator(
+        `link[rel="alternate"][hreflang="${article.locale}"]`,
+      ),
+    ).toHaveAttribute("href", `https://jurnal.dev${path}`)
+    const alternateLocale = article.locale === "en" ? "id" : "en"
+    await expect(
+      page.locator(
+        `link[rel="alternate"][hreflang="${alternateLocale}"]`,
+      ),
+    ).toHaveAttribute("href", `https://jurnal.dev${article.alternateHref}`)
+    await expect(page.locator('meta[property="og:url"]')).toHaveAttribute(
+      "content",
+      `https://jurnal.dev${path}`,
+    )
+    await expectOpenGraphLocales(page, article.locale, true)
+    await expectLocalizedMetadataTargets(page)
   })
 }
 
@@ -230,9 +309,8 @@ for (const project of [
   test(`localized route tree /${project.locale}/portfolio/${project.slug} renders one localized project`, async ({
     page,
   }) => {
-    const response = await page.goto(
-      `/${project.locale}/portfolio/${project.slug}`,
-    )
+    const path = `/${project.locale}/portfolio/${project.slug}`
+    const response = await page.goto(path)
 
     expect(response?.status()).toBe(200)
     await expect(page.locator("html")).toHaveAttribute("lang", project.locale)
@@ -245,6 +323,27 @@ for (const project of [
     await expect(
       page.getByRole("link", { name: project.back }),
     ).toHaveAttribute("href", `/${project.locale}/portfolio`)
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+      "href",
+      `https://jurnal.dev${path}`,
+    )
+    await expect(
+      page.locator(
+        `link[rel="alternate"][hreflang="${project.locale}"]`,
+      ),
+    ).toHaveAttribute("href", `https://jurnal.dev${path}`)
+    const alternateLocale = project.locale === "en" ? "id" : "en"
+    await expect(
+      page.locator(
+        `link[rel="alternate"][hreflang="${alternateLocale}"]`,
+      ),
+    ).toHaveAttribute("href", `https://jurnal.dev${project.alternateHref}`)
+    await expect(page.locator('meta[property="og:url"]')).toHaveAttribute(
+      "content",
+      `https://jurnal.dev${path}`,
+    )
+    await expectOpenGraphLocales(page, project.locale, true)
+    await expectLocalizedMetadataTargets(page)
   })
 }
 
@@ -257,6 +356,25 @@ test("localized route tree disables a missing article translation", async ({
   const unavailable = page.getByLabel("English: Translation unavailable")
   await expect(unavailable).toHaveAttribute("aria-disabled", "true")
   await expect(unavailable).not.toHaveAttribute("href")
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    "href",
+    "https://jurnal.dev/id/jurnal/agent-pertama-gw",
+  )
+  await expect(
+    page.locator('link[rel="alternate"][hreflang="id"]'),
+  ).toHaveAttribute(
+    "href",
+    "https://jurnal.dev/id/jurnal/agent-pertama-gw",
+  )
+  await expect(
+    page.locator('link[rel="alternate"][hreflang="en"]'),
+  ).toHaveCount(0)
+  await expect(page.locator('meta[property="og:url"]')).toHaveAttribute(
+    "content",
+    "https://jurnal.dev/id/jurnal/agent-pertama-gw",
+  )
+  await expectOpenGraphLocales(page, "id", false)
+  await expectLocalizedMetadataTargets(page)
 })
 
 for (const path of [
