@@ -1,4 +1,9 @@
-import { expect, test, type Page } from "@playwright/test"
+import {
+  expect,
+  test,
+  type APIRequestContext,
+  type Page,
+} from "@playwright/test"
 
 test.beforeEach(async ({ page }) => {
   const errors: string[] = []
@@ -15,6 +20,79 @@ function recordedErrors(page: Page) {
 
 test.afterEach(async ({ page }) => {
   expect(recordedErrors(page)).toEqual([])
+})
+
+async function expectPermanentRedirect(
+  request: APIRequestContext,
+  path: string,
+  destination: string,
+) {
+  const response = await request.get(path, { maxRedirects: 0 })
+  expect(response.status()).toBe(308)
+  const location = new URL(response.headers().location)
+  expect(`${location.pathname}${location.search}`).toBe(destination)
+}
+
+test("legacy root redirect is a deterministic permanent redirect", async ({
+  request,
+}) => {
+  await expectPermanentRedirect(request, "/", "/en")
+})
+
+test("legacy journal listing redirect preserves its query string", async ({
+  request,
+}) => {
+  await expectPermanentRedirect(
+    request,
+    "/jurnal?utm_source=old",
+    "/en/jurnal?utm_source=old",
+  )
+})
+
+test("legacy portfolio listing redirect is deterministic", async ({
+  request,
+}) => {
+  await expectPermanentRedirect(request, "/portfolio", "/en/portfolio")
+})
+
+test("legacy article redirects resolve locale, preserve query, and encode once", async ({
+  request,
+}) => {
+  await expectPermanentRedirect(
+    request,
+    "/jurnal/my-first-llm-call?ref=old",
+    "/en/jurnal/my-first-llm-call?ref=old",
+  )
+  await expectPermanentRedirect(
+    request,
+    "/jurnal/pertama-kali-manggil-llm",
+    "/id/jurnal/pertama-kali-manggil-llm",
+  )
+  await expectPermanentRedirect(
+    request,
+    "/jurnal/my%2Dfirst%2Dllm%2Dcall",
+    "/en/jurnal/my-first-llm-call",
+  )
+
+  const missing = await request.get("/jurnal/unknown-legacy-article", {
+    maxRedirects: 0,
+  })
+  expect(missing.status()).toBe(404)
+})
+
+test("legacy project redirects resolve both locales and preserve queries", async ({
+  request,
+}) => {
+  await expectPermanentRedirect(
+    request,
+    "/portfolio/jurnal-summarizer?campaign=old",
+    "/en/portfolio/jurnal-summarizer?campaign=old",
+  )
+  await expectPermanentRedirect(
+    request,
+    "/portfolio/perangkum-jurnal",
+    "/id/portfolio/perangkum-jurnal",
+  )
 })
 
 for (const locale of ["en", "id"] as const) {
@@ -122,7 +200,9 @@ for (const article of [
     await expect(
       page.getByRole("link", { name: article.alternateName }),
     ).toHaveAttribute("href", article.alternateHref)
-    await expect(page.locator(`article a[href^="/${article.locale}/jurnal/"]`).first()).toBeVisible()
+    await expect(
+      page.locator(`article a[href^="/${article.locale}/jurnal/"]`).first(),
+    ).toBeVisible()
 
     const shareHref = await page
       .getByLabel("Share on Twitter/X")
@@ -162,10 +242,9 @@ for (const project of [
     await expect(
       page.getByRole("link", { name: project.alternateName }),
     ).toHaveAttribute("href", project.alternateHref)
-    await expect(page.getByRole("link", { name: project.back })).toHaveAttribute(
-      "href",
-      `/${project.locale}/portfolio`,
-    )
+    await expect(
+      page.getByRole("link", { name: project.back }),
+    ).toHaveAttribute("href", `/${project.locale}/portfolio`)
   })
 }
 
