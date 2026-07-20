@@ -20,7 +20,7 @@ const copy = {
     eyebrow: "Portfolio",
     title: "Selected work.",
     subtitle:
-      "Projects I've built and shipped — production services, AI experiments, side projects.",
+      "Projects I've built in the past and present. Everything you can read here, from production-ready, AI experiments, to side projects.",
     empty: "No projects yet. Check back soon.",
     featuredLabel: "Featured",
     count: (count: number) =>
@@ -30,7 +30,7 @@ const copy = {
     eyebrow: "Portofolio",
     title: "Karya pilihan.",
     subtitle:
-      "Project yang gw bikin dan rilis — service production, eksperimen AI, side project.",
+      "Project yang pernah/sedang gue build. Semuanya kalian bisa baca disini, dari yang udah di production, eksperimen AI, sampai side project.",
     empty: "Belum ada project. Cek lagi nanti ya.",
     featuredLabel: "Featured",
     count: (count: number) => `${count} project`,

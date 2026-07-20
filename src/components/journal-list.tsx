@@ -13,7 +13,7 @@ const copy = {
     eyebrow: "Journal",
     title: "Notes from learning.",
     subtitle:
-      "A running log of what I'm learning as a backend engineer exploring AI. Unpolished, honest, mine.",
+      "A running log of me. My interest, my learning, my thoughts. It's all here, hope y'll enjoy it.",
     empty: "No entries yet. Check back soon.",
     error: "Articles are temporarily unavailable. Try again.",
     retry: "Try again",
@@ -22,8 +22,7 @@ const copy = {
   id: {
     eyebrow: "Jurnal",
     title: "Catatan dari proses belajar.",
-    subtitle:
-      "Log berjalan dari apa yang gw pelajarin sebagai backend engineer yang lagi eksplor AI. Mentah, jujur, milik gw.",
+    subtitle: `"Log" gue. Minat gue, proses belajar gue, pemikiran gue. Semua ada di sini, semoga klean suka. ✌️`,
     empty: "Belum ada entry. Cek lagi nanti ya.",
     error: "Artikel sementara tidak tersedia. Coba lagi.",
     retry: "Coba lagi",
