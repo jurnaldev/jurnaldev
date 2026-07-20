@@ -23,7 +23,7 @@ Unit tests live beside source as `*.test.ts`; browser tests live in
 
 Copy `.env.example` → `.env.local`. Both vars are optional:
 
-- `NEXT_PUBLIC_STRAPI_URL` + `STRAPI_API_TOKEN` — CMS. Without a URL, app uses mock data (`src/lib/strapi/mock.ts`). With a URL, failures propagate unless `STRAPI_MOCK_FALLBACK=true` is explicitly set.
+- `NEXT_PUBLIC_STRAPI_URL` + `STRAPI_API_TOKEN` — CMS. Without a URL, app uses mock data (`src/lib/strapi/mock.ts`). With a URL, failures propagate unless `STRAPI_MOCK_FALLBACK=true` is explicitly set. The only exception is a 404 from the optional `projects` collection, which returns empty project results until that collection is deployed; authentication failures, 5xx responses, timeouts, network failures, and other resources remain strict.
 - `NEXT_PUBLIC_SITE_URL` — canonical public origin (defaults to `https://jurnal.dev`)
 - `NEXT_PUBLIC_GISCUS_REPO` + `NEXT_PUBLIC_GISCUS_REPO_ID` + `NEXT_PUBLIC_GISCUS_CATEGORY` + `NEXT_PUBLIC_GISCUS_CATEGORY_ID` — comments. Hidden if unset
 
@@ -33,7 +33,7 @@ Next.js 16 App Router, React 19, TypeScript strict, Tailwind CSS v4, deployed st
 
 ### Data layer: `src/lib/strapi/`
 
-- `index.ts` — public API (`fetchArticles`, `fetchArticleBySlug`, `fetchRelatedArticles`, `fetchAllSlugs`). Uses mock data when `NEXT_PUBLIC_STRAPI_URL` is unset. Configured CMS failures propagate unless `STRAPI_MOCK_FALLBACK=true` explicitly enables preview/demo fallback
+- `index.ts` — public API (`fetchArticles`, `fetchArticleBySlug`, `fetchRelatedArticles`, `fetchAllSlugs`). Uses mock data when `NEXT_PUBLIC_STRAPI_URL` is unset. Configured CMS failures propagate unless `STRAPI_MOCK_FALLBACK=true` explicitly enables preview/demo fallback; a missing optional `projects` route (404 only) resolves to empty project results before generic fallback
 - `client.ts` — REST calls to Strapi v5
 - `mock.ts` — 5 sample articles for local dev
 - `types.ts` — `StrapiArticle`, `StrapiAuthor`, `StrapiTag`, `StrapiImage`, `Locale`

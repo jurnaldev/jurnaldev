@@ -311,6 +311,11 @@ Vitest unit tests live beside source files. Playwright smoke tests live in
 `tests/e2e/`. When Strapi is configured, CMS failures are surfaced; bundled
 mock fallback after a CMS failure must be explicitly enabled with
 `STRAPI_MOCK_FALLBACK=true` and is intended only for preview/demo environments.
+The narrow exception is a 404 from the optional `projects` collection: project
+lists and slug enumeration return empty arrays, while detail reads return
+`null`, until the collection is deployed. This exception does not apply to
+401/403 responses, 5xx responses, timeouts, network failures, or other Strapi
+resources.
 
 ---
 
