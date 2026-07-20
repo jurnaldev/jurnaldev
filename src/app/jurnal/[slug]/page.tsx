@@ -78,13 +78,13 @@ export default async function ArticlePage({ params }: PageProps) {
     en: resolvedEn
       ? {
           readingTime: calculateReadingTime(resolvedEn.body),
-          headings: extractHeadings(resolvedEn.body),
+          headings: extractHeadings(resolvedEn.body, "article-en"),
         }
       : null,
     id: resolvedId
       ? {
           readingTime: calculateReadingTime(resolvedId.body),
-          headings: extractHeadings(resolvedId.body),
+          headings: extractHeadings(resolvedId.body, "article-id"),
         }
       : null,
   }

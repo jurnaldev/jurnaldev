@@ -6,7 +6,7 @@
 
 **Architecture:** Keep the App Router/server-rendered design, move interaction to explicit client leaves, enforce a timed Strapi boundary with opt-in fallback, and share pure parsing utilities between HTTP, Markdown rendering, and tests. Add standard verification without implementing the deferred locale-path migration.
 
-**Tech Stack:** Next.js 16, React 19, TypeScript 6 strict, Strapi v5 REST, Vitest, Playwright, ESLint 10 flat config, GitHub Actions, pnpm 10 on Node 20.
+**Tech Stack:** Next.js 16, React 19, TypeScript 6 strict, Strapi v5 REST, Vitest, Playwright, ESLint 9 flat config, GitHub Actions, pnpm 10 on Node 20.
 
 **Spec:** `docs/superpowers/specs/2026-07-20-production-hardening-design.md`
 

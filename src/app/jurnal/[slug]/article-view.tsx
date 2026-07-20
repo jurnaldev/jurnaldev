@@ -1,4 +1,4 @@
-import type { StrapiArticle } from "@/lib/strapi/types"
+import type { StrapiArticle, StrapiArticleSummary } from "@/lib/strapi/types"
 import { ArticleBody } from "@/components/article/article-body"
 import { ArticleHeader } from "@/components/article/article-header"
 import { AuthorCard } from "@/components/article/author-card"
@@ -8,6 +8,7 @@ import { ShareButtons } from "@/components/article/share-buttons"
 import { GiscusComments } from "@/components/article/giscus-comments"
 import { SiteHeader } from "@/components/layout/site-header"
 import { LocaleGate } from "@/components/locale-gate"
+import { articleUrl } from "@/lib/site"
 
 interface ArticleMeta {
   readingTime: { minutes: number; text: string }
@@ -19,8 +20,8 @@ interface Props {
   articleId: StrapiArticle | null
   metaEn: ArticleMeta | null
   metaId: ArticleMeta | null
-  relatedEn: StrapiArticle[]
-  relatedId: StrapiArticle[]
+  relatedEn: StrapiArticleSummary[]
+  relatedId: StrapiArticleSummary[]
   slug: string
 }
 
@@ -34,16 +35,18 @@ export async function ArticleView({
   slug,
 }: Props) {
   // Pre-render both bodies on the server for SEO + static code highlighting
-  const bodyEn = articleEn ? await ArticleBody({ body: articleEn.body }) : null
-  const bodyId = articleId ? await ArticleBody({ body: articleId.body }) : null
-
-  const shareUrl =
-    typeof window !== "undefined"
-      ? window.location.href
-      : `https://jurnal.dev/jurnal/${(articleEn || articleId)?.slug}`
+  const bodyEn = articleEn
+    ? await ArticleBody({ body: articleEn.body, headingPrefix: "article-en" })
+    : null
+  const bodyId = articleId
+    ? await ArticleBody({ body: articleId.body, headingPrefix: "article-id" })
+    : null
 
   return (
-    <main className="page-enter" style={{ minHeight: "100vh", position: "relative" }}>
+    <main
+      className="page-enter"
+      style={{ minHeight: "100vh", position: "relative" }}
+    >
       <div
         style={{
           position: "relative",
@@ -73,7 +76,10 @@ export async function ArticleView({
                     paddingTop: "2rem",
                   }}
                 >
-                  <ShareButtons title={articleEn.title} url={shareUrl} />
+                  <ShareButtons
+                    title={articleEn.title}
+                    url={articleUrl(articleEn.slug)}
+                  />
                 </div>
                 {articleEn.author && <AuthorCard author={articleEn.author} />}
                 {relatedEn.length > 0 && (
@@ -98,7 +104,10 @@ export async function ArticleView({
                     paddingTop: "2rem",
                   }}
                 >
-                  <ShareButtons title={articleId.title} url={shareUrl} />
+                  <ShareButtons
+                    title={articleId.title}
+                    url={articleUrl(articleId.slug)}
+                  />
                 </div>
                 {articleId.author && <AuthorCard author={articleId.author} />}
                 {relatedId.length > 0 && (

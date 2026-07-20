@@ -2,7 +2,7 @@
 
 Personal portfolio + journal platform untuk **@jurnal.dev** — Swiss/Helvetica minimal aesthetic dengan dark/light mode, EN/ID language toggle, dan headless CMS integration.
 
-Built with Next.js 15 (App Router), TypeScript, Tailwind CSS, Geist font, dan Strapi v5.
+Built with Next.js 16 (App Router), TypeScript, Tailwind CSS, Geist font, dan Strapi v5.
 
 ---
 
@@ -10,13 +10,13 @@ Built with Next.js 15 (App Router), TypeScript, Tailwind CSS, Geist font, dan St
 
 ```bash
 # 1. Install dependencies
-npm install
+pnpm install
 
 # 2. Copy env template (optional — works without Strapi using mock data)
 cp .env.example .env.local
 
 # 3. Run dev server
-npm run dev
+pnpm dev
 
 # Open http://localhost:3000
 ```
@@ -33,12 +33,14 @@ npm run dev
 | `/`              | Landing page (hero, about, journal preview, lab, connect) |
 | `/jurnal`        | All journal entries (grid, filterable by locale)          |
 | `/jurnal/[slug]` | Individual article with TOC, related posts, share buttons |
+| `/portfolio`     | Selected projects                                        |
+| `/portfolio/[slug]` | Project case study                                    |
 
 ---
 
 ## Tech stack
 
-- **Framework**: Next.js 15 (App Router, React 19)
+- **Framework**: Next.js 16 (App Router, React 19)
 - **Language**: TypeScript (strict)
 - **Styling**: Tailwind CSS + CSS variables (theme-aware)
 - **Fonts**: Geist Sans + Geist Mono
@@ -273,9 +275,9 @@ Setelah deploy:
 FROM node:20-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci
+RUN corepack enable && pnpm install --frozen-lockfile
 COPY . .
-RUN npm run build
+RUN pnpm build
 
 FROM node:20-alpine
 WORKDIR /app
@@ -284,24 +286,24 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/node_modules ./node_modules
 EXPOSE 3000
-CMD ["npm", "start"]
+CMD ["pnpm", "start"]
 ```
 
 Pair dengan Cloudflare Tunnel atau Traefik reverse proxy.
 
-### Static export (optional)
-
-Kalau landing page ini fully static (ga ada dynamic data), bisa export ke plain HTML:
-
-```js
-// next.config.mjs
-export default { output: "export" }
-```
+### Verification
 
 ```bash
-npm run build
-# Output di /out — deploy ke Cloudflare Pages, GitHub Pages, Netlify, dll
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm verify:e2e
 ```
+
+Vitest unit tests live beside source files. Playwright smoke tests live in
+`tests/e2e/`. When Strapi is configured, CMS failures are surfaced; bundled
+mock fallback after a CMS failure must be explicitly enabled with
+`STRAPI_MOCK_FALLBACK=true` and is intended only for preview/demo environments.
 
 ---
 

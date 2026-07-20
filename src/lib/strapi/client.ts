@@ -1,5 +1,6 @@
 import type {
   StrapiArticle,
+  StrapiArticleSummary,
   StrapiProject,
   StrapiLandingPage,
   StrapiSocialLink,
@@ -29,6 +30,7 @@ async function strapiFetch<T>(
 
   const res = await fetch(url, {
     headers,
+    signal: AbortSignal.timeout(8_000),
     next: options.next ?? { revalidate: 60 }, // ISR: 60s default
     cache: options.cache,
   })
@@ -48,6 +50,7 @@ async function strapiFetch<T>(
 export function strapiMediaUrl(url: string | undefined | null): string | null {
   if (!url) return null
   if (url.startsWith("http")) return url
+  if (url.startsWith("/mock/") || !process.env.NEXT_PUBLIC_STRAPI_URL) return url
   return `${STRAPI_URL}${url}`
 }
 
@@ -56,10 +59,19 @@ export function strapiMediaUrl(url: string | undefined | null): string | null {
 export async function getArticles(
   locale: Locale = "en",
   options?: { limit?: number; featured?: boolean },
-): Promise<StrapiArticle[]> {
+): Promise<StrapiArticleSummary[]> {
   const params = new URLSearchParams({
     locale,
     "sort[0]": "publishedAt:desc",
+    "fields[0]": "documentId",
+    "fields[1]": "slug",
+    "fields[2]": "title",
+    "fields[3]": "excerpt",
+    "fields[4]": "publishedAt",
+    "fields[5]": "updatedAt",
+    "fields[6]": "locale",
+    "fields[7]": "featured",
+    "fields[8]": "entryNumber",
     "populate[cover]": "true",
     "populate[tags]": "true",
     "populate[author][populate]": "avatar",
@@ -67,7 +79,7 @@ export async function getArticles(
   if (options?.limit) params.set("pagination[limit]", String(options.limit))
   if (options?.featured) params.set("filters[featured][$eq]", "true")
 
-  const res = await strapiFetch<StrapiListResponse<StrapiArticle>>(
+  const res = await strapiFetch<StrapiListResponse<StrapiArticleSummary>>(
     `/articles?${params.toString()}`,
     { next: { revalidate: 60, tags: ["articles"] } },
   )
@@ -99,7 +111,7 @@ export async function getRelatedArticles(
   tagIds: number[],
   locale: Locale = "en",
   limit = 3,
-): Promise<StrapiArticle[]> {
+): Promise<StrapiArticleSummary[]> {
   if (!tagIds.length) return []
 
   const params = new URLSearchParams({
@@ -107,6 +119,15 @@ export async function getRelatedArticles(
     "sort[0]": "publishedAt:desc",
     "populate[cover]": "true",
     "populate[tags]": "true",
+    "fields[0]": "documentId",
+    "fields[1]": "slug",
+    "fields[2]": "title",
+    "fields[3]": "excerpt",
+    "fields[4]": "publishedAt",
+    "fields[5]": "updatedAt",
+    "fields[6]": "locale",
+    "fields[7]": "featured",
+    "fields[8]": "entryNumber",
     "filters[slug][$ne]": currentSlug,
     "pagination[limit]": String(limit),
   })
@@ -114,7 +135,7 @@ export async function getRelatedArticles(
     params.set(`filters[tags][id][$in][${i}]`, String(id))
   })
 
-  const res = await strapiFetch<StrapiListResponse<StrapiArticle>>(
+  const res = await strapiFetch<StrapiListResponse<StrapiArticleSummary>>(
     `/articles?${params.toString()}`,
     { next: { revalidate: 300 } },
   )
@@ -202,21 +223,36 @@ export async function getAllSlugs(): Promise<
   const result: Array<{ slug: string; locale: Locale }> = []
 
   for (const locale of ["en", "id"] as Locale[]) {
-    try {
-      const params = new URLSearchParams({
-        locale,
-        "fields[0]": "slug",
-        "pagination[limit]": "1000",
-      })
-      const res = await strapiFetch<StrapiListResponse<{ slug: string }>>(
-        `/articles?${params.toString()}`,
-        { next: { revalidate: 300 } },
-      )
-      res.data.forEach((a) => result.push({ slug: a.slug, locale }))
-    } catch {
-      // Strapi offline — return empty so build doesn't fail
-    }
+    const params = new URLSearchParams({
+      locale,
+      "fields[0]": "slug",
+      "pagination[limit]": "1000",
+    })
+    const res = await strapiFetch<StrapiListResponse<{ slug: string }>>(
+      `/articles?${params.toString()}`,
+      { next: { revalidate: 300 } },
+    )
+    res.data.forEach((a) => result.push({ slug: a.slug, locale }))
   }
 
+  return result
+}
+
+export async function getAllProjectSlugs(): Promise<
+  Array<{ slug: string; locale: Locale }>
+> {
+  const result: Array<{ slug: string; locale: Locale }> = []
+  for (const locale of ["en", "id"] as Locale[]) {
+    const params = new URLSearchParams({
+      locale,
+      "fields[0]": "slug",
+      "pagination[limit]": "1000",
+    })
+    const res = await strapiFetch<StrapiListResponse<{ slug: string }>>(
+      `/projects?${params.toString()}`,
+      { next: { revalidate: 300 } },
+    )
+    res.data.forEach((project) => result.push({ slug: project.slug, locale }))
+  }
   return result
 }

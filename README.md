@@ -49,3 +49,15 @@ Available in English and Bahasa Indonesia.
 ---
 
 <sub>Crafted in Jakarta · learning in public · open to interesting collaborations</sub>
+
+#### Development
+
+The application uses pnpm and Node.js 20:
+
+```bash
+pnpm install
+pnpm dev
+pnpm verify
+```
+
+See [DOCS.md](./DOCS.md) for architecture, CMS setup, testing, and deployment.

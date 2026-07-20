@@ -1,4 +1,3 @@
-import { Copy } from "lucide-react"
 import { CopyButton } from "./copy-button"
 
 interface CodeBlockProps {

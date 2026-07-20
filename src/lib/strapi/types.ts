@@ -60,6 +60,23 @@ export interface StrapiArticle {
   entryNumber?: number // e.g., 001, 002, 003
 }
 
+export type StrapiArticleSummary = Pick<
+  StrapiArticle,
+  | "id"
+  | "documentId"
+  | "slug"
+  | "title"
+  | "excerpt"
+  | "publishedAt"
+  | "updatedAt"
+  | "locale"
+  | "cover"
+  | "tags"
+  | "author"
+  | "featured"
+  | "entryNumber"
+>
+
 export type ProjectStatus = "live" | "wip" | "archived"
 
 export interface StrapiProject {

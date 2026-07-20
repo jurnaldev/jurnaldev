@@ -4,7 +4,8 @@ import { useEffect, useState } from "react"
 import { useLang } from "@/contexts/lang-context"
 import { SiteHeader } from "@/components/layout/site-header"
 import { ArticleCard } from "@/components/article/article-card"
-import type { StrapiArticle } from "@/lib/strapi/types"
+import type { StrapiArticleSummary } from "@/lib/strapi/types"
+import { loadArticles } from "@/lib/client/load-articles"
 
 const copy = {
   en: {
@@ -28,21 +29,36 @@ const copy = {
 export default function JurnalListPage() {
   const { lang } = useLang()
   const t = copy[lang]
-  const [articles, setArticles] = useState<StrapiArticle[] | null>(null)
+  const [retry, setRetry] = useState(0)
+  const [result, setResult] = useState<{
+    lang: string
+    status: "loading" | "success" | "error"
+    articles: StrapiArticleSummary[]
+  }>({ lang, status: "loading", articles: [] })
+  const current =
+    result.lang === lang
+      ? result
+      : { lang, status: "loading" as const, articles: [] }
+  const articles = current.articles
 
   useEffect(() => {
-    let mounted = true
-    fetch(`/api/articles?locale=${lang}`)
-      .then((r) => r.json())
-      .then((data) => {
-        if (mounted) setArticles(data.articles ?? [])
+    const controller = new AbortController()
+    loadArticles(`/api/articles?locale=${lang}`, controller.signal)
+      .then((nextArticles) => {
+        setResult({ lang, status: "success", articles: nextArticles })
       })
-      .catch(() => { mounted = false })
-    return () => { mounted = false }
-  }, [lang])
+      .catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === "AbortError") return
+        setResult({ lang, status: "error", articles: [] })
+      })
+    return () => controller.abort()
+  }, [lang, retry])
 
   return (
-    <main className="page-enter" style={{ minHeight: "100dvh", position: "relative" }}>
+    <main
+      className="page-enter"
+      style={{ minHeight: "100dvh", position: "relative" }}
+    >
       <div
         style={{
           position: "relative",
@@ -92,7 +108,7 @@ export default function JurnalListPage() {
           </p>
         </section>
 
-        {articles !== null && articles.length > 0 && (
+        {current.status === "success" && articles.length > 0 && (
           <div
             style={{
               fontFamily: "var(--font-geist-mono), monospace",
@@ -109,8 +125,21 @@ export default function JurnalListPage() {
 
         <div style={{ height: "1px", background: "var(--hairline)" }} />
 
-        {articles === null ? (
+        {current.status === "loading" ? (
           <LoadingList />
+        ) : current.status === "error" ? (
+          <ErrorState
+            message={
+              lang === "id"
+                ? "Artikel sementara tidak tersedia. Coba lagi."
+                : "Articles are temporarily unavailable. Try again."
+            }
+            retryLabel={lang === "id" ? "Coba lagi" : "Try again"}
+            onRetry={() => {
+              setResult({ lang, status: "loading", articles: [] })
+              setRetry((value) => value + 1)
+            }}
+          />
         ) : articles.length === 0 ? (
           <div
             style={{
@@ -130,7 +159,9 @@ export default function JurnalListPage() {
                 key={article.id}
                 style={{
                   borderBottom:
-                    i < articles.length - 1 ? "1px solid var(--hairline)" : "none",
+                    i < articles.length - 1
+                      ? "1px solid var(--hairline)"
+                      : "none",
                 }}
               >
                 <ArticleCard article={article} index={i} />
@@ -140,6 +171,25 @@ export default function JurnalListPage() {
         )}
       </div>
     </main>
+  )
+}
+
+function ErrorState({
+  message,
+  retryLabel,
+  onRetry,
+}: {
+  message: string
+  retryLabel: string
+  onRetry: () => void
+}) {
+  return (
+    <div style={{ padding: "3rem 1.5rem", textAlign: "center" }}>
+      <p style={{ color: "var(--graphite)" }}>{message}</p>
+      <button type="button" onClick={onRetry}>
+        {retryLabel}
+      </button>
+    </div>
   )
 }
 

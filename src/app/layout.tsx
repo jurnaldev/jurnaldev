@@ -4,11 +4,12 @@ import { GeistMono } from "geist/font/mono"
 import { ThemeProvider } from "@/contexts/theme-context"
 import { LangProvider } from "@/contexts/lang-context"
 import { themeScript } from "@/lib/theme-script"
+import { SITE_URL } from "@/lib/site"
 
 import "./globals.css"
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://jurnal.dev"),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "Fahmi — jurnal.dev",
     template: "%s · jurnal.dev",
@@ -54,9 +55,6 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  icons: {
-    icon: "/favicon.ico",
-  },
 }
 
 export const viewport: Viewport = {
@@ -80,7 +78,7 @@ export default function RootLayout({
       className={`${GeistSans.variable} ${GeistMono.variable}`}
     >
       <head>
-        <template
+        <script
           id="theme-script"
           dangerouslySetInnerHTML={{ __html: themeScript }}
         />

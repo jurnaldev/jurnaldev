@@ -1,11 +1,11 @@
-import type { StrapiArticle } from "@/lib/strapi/types"
+import type { StrapiArticleSummary } from "@/lib/strapi/types"
 import { ArticleCard } from "./article-card"
 
 export function RelatedArticles({
   articles,
   label,
 }: {
-  articles: StrapiArticle[]
+  articles: StrapiArticleSummary[]
   label: string
 }) {
   if (articles.length === 0) return null

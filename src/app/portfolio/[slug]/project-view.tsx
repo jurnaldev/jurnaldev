@@ -1,7 +1,10 @@
 import Link from "next/link"
 import type { StrapiProject } from "@/lib/strapi/types"
 import { ArticleBody } from "@/components/article/article-body"
-import { ProjectMeta, type MetaLabels } from "@/components/portfolio/project-meta"
+import {
+  ProjectMeta,
+  type MetaLabels,
+} from "@/components/portfolio/project-meta"
 import { ProjectGallery } from "@/components/portfolio/project-gallery"
 import { SiteHeader } from "@/components/layout/site-header"
 import { LocaleGate } from "@/components/locale-gate"
@@ -156,8 +159,12 @@ function MissingLocaleNotice({ locale }: { locale: "en" | "id" }) {
 }
 
 export async function ProjectView({ projectEn, projectId }: Props) {
-  const bodyEn = projectEn ? await ArticleBody({ body: projectEn.body }) : null
-  const bodyId = projectId ? await ArticleBody({ body: projectId.body }) : null
+  const bodyEn = projectEn
+    ? await ArticleBody({ body: projectEn.body, headingPrefix: "project-en" })
+    : null
+  const bodyId = projectId
+    ? await ArticleBody({ body: projectId.body, headingPrefix: "project-id" })
+    : null
 
   return (
     <main

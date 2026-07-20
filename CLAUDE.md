@@ -8,21 +8,28 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 pnpm dev        # Dev server (http://localhost:3000)
 pnpm build      # Production build
 pnpm start      # Run production build
-pnpm lint       # ESLint via next lint
+pnpm lint       # ESLint flat config
+pnpm typecheck  # TypeScript no-emit validation
+pnpm test       # Vitest unit tests
+pnpm test:e2e   # Playwright against an existing production build
+pnpm verify     # Lint + typecheck + tests + production build
+pnpm verify:e2e # Full verification including Playwright
 ```
 
-No test suite. Formatting via Prettier (`.prettierrc`).
+Unit tests live beside source as `*.test.ts`; browser tests live in
+`tests/e2e/`. Formatting uses Prettier (`.prettierrc`).
 
 ## Environment
 
 Copy `.env.example` → `.env.local`. Both vars are optional:
 
-- `NEXT_PUBLIC_STRAPI_URL` + `STRAPI_API_TOKEN` — CMS. Without these, app uses mock data (`src/lib/strapi/mock.ts`)
+- `NEXT_PUBLIC_STRAPI_URL` + `STRAPI_API_TOKEN` — CMS. Without a URL, app uses mock data (`src/lib/strapi/mock.ts`). With a URL, failures propagate unless `STRAPI_MOCK_FALLBACK=true` is explicitly set.
+- `NEXT_PUBLIC_SITE_URL` — canonical public origin (defaults to `https://jurnal.dev`)
 - `NEXT_PUBLIC_GISCUS_REPO` + `NEXT_PUBLIC_GISCUS_REPO_ID` + `NEXT_PUBLIC_GISCUS_CATEGORY` + `NEXT_PUBLIC_GISCUS_CATEGORY_ID` — comments. Hidden if unset
 
 ## Architecture
 
-Next.js 15 App Router, React 19, TypeScript strict, Tailwind CSS v4, deployed standalone (`output: "standalone"`).
+Next.js 16 App Router, React 19, TypeScript strict, Tailwind CSS v4, deployed standalone (`output: "standalone"`).
 
 ### Data layer: `src/lib/strapi/`
 

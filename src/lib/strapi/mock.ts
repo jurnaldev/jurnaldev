@@ -1,5 +1,6 @@
 import type {
   StrapiArticle,
+  StrapiArticleSummary,
   StrapiProject,
   StrapiLandingPage,
   StrapiSocialLink,
@@ -220,6 +221,19 @@ export const mockArticles: StrapiArticle[] = [
 
 export function getMockArticles(locale: "en" | "id" = "en"): StrapiArticle[] {
   return mockArticles.filter((a) => a.locale === locale)
+}
+
+export function toArticleSummary(article: StrapiArticle): StrapiArticleSummary {
+  const summary: Partial<StrapiArticle> = { ...article }
+  delete summary.body
+  delete summary.localizations
+  return summary as StrapiArticleSummary
+}
+
+export function getMockArticleSummaries(
+  locale: Locale = "en",
+): StrapiArticleSummary[] {
+  return getMockArticles(locale).map(toArticleSummary)
 }
 
 export function getMockArticleBySlug(
@@ -481,8 +495,7 @@ export const mockProjects: StrapiProject[] = [
     documentId: "mock-project-3-id",
     slug: "devlog-cli",
     title: "devlog CLI",
-    excerpt:
-      "Tool terminal buat nyatet entry jurnal dev langsung dari shell.",
+    excerpt: "Tool terminal buat nyatet entry jurnal dev langsung dari shell.",
     body: sampleBody,
     year: 2025,
     status: "wip",

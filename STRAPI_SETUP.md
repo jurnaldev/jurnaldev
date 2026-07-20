@@ -183,7 +183,7 @@ Restart Next.js dev server. Done — now `/jurnal` reads from Strapi.
 - **Media storage**: AWS S3 / Cloudflare R2 via `@strapi/provider-upload-aws-s3` plugin
 - **CDN**: Cloudflare in front of Strapi
 - **Domain**: `cms.jurnal.dev`
-- **Revalidation**: Setup webhook in Strapi → Next.js API route to trigger `revalidateTag('articles')` on publish
+- **Revalidation**: Content uses 60-second ISR. On-demand webhook invalidation is future work and is not currently implemented.
 
 ---
 

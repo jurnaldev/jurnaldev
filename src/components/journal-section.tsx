@@ -5,11 +5,9 @@ import Link from "next/link"
 import { ImageOff } from "lucide-react"
 import { useLang, type Lang } from "@/contexts/lang-context"
 import { strapiMediaUrl } from "@/lib/strapi"
-import {
-  formatDateShort,
-  formatEntryNumber,
-} from "@/lib/article-utils"
-import type { StrapiArticle, StrapiEmptyState } from "@/lib/strapi/types"
+import { formatDateShort, formatEntryNumber } from "@/lib/article-utils"
+import type { StrapiArticleSummary, StrapiEmptyState } from "@/lib/strapi/types"
+import { loadArticles } from "@/lib/client/load-articles"
 
 interface Props {
   emptyState: Record<Lang, StrapiEmptyState>
@@ -18,30 +16,65 @@ interface Props {
 
 export function JournalSection({ emptyState, viewAllLabel }: Props) {
   const { lang } = useLang()
-  const [articles, setArticles] = useState<StrapiArticle[] | null>(null)
+  const [retry, setRetry] = useState(0)
+  const [result, setResult] = useState<{
+    lang: Lang
+    status: "loading" | "success" | "error"
+    articles: StrapiArticleSummary[]
+  }>({ lang, status: "loading", articles: [] })
+  const current =
+    result.lang === lang
+      ? result
+      : { lang, status: "loading" as const, articles: [] }
+  const articles = current.articles
 
   useEffect(() => {
-    let mounted = true
-    fetch(`/api/articles?locale=${lang}&limit=3`)
-      .then((r) => r.json())
-      .then((data) => {
-        if (mounted) setArticles(data.articles ?? [])
+    const controller = new AbortController()
+    loadArticles(`/api/articles?locale=${lang}&limit=3`, controller.signal)
+      .then((nextArticles) => {
+        setResult({ lang, status: "success", articles: nextArticles })
       })
-      .catch(() => {
-        if (mounted) setArticles([])
+      .catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === "AbortError") return
+        setResult({ lang, status: "error", articles: [] })
       })
-    return () => {
-      mounted = false
-    }
-  }, [lang])
+    return () => controller.abort()
+  }, [lang, retry])
 
-  if (articles !== null && articles.length === 0) {
+  if (current.status === "error") {
+    return (
+      <div style={{ padding: "1.5rem", border: "1px solid var(--hairline)" }}>
+        <p style={{ color: "var(--graphite)" }}>
+          {lang === "id"
+            ? "Artikel sementara tidak tersedia. Coba lagi."
+            : "Articles are temporarily unavailable. Try again."}
+        </p>
+        <button
+          type="button"
+          onClick={() => {
+            setResult({ lang, status: "loading", articles: [] })
+            setRetry((value) => value + 1)
+          }}
+        >
+          {lang === "id" ? "Coba lagi" : "Try again"}
+        </button>
+      </div>
+    )
+  }
+
+  if (current.status === "success" && articles.length === 0) {
     return <EmptyState empty={emptyState[lang]} />
   }
 
-  if (articles === null) {
+  if (current.status === "loading") {
     return (
-      <div style={{ display: "flex", flexDirection: "column", marginBottom: "1.5rem" }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          marginBottom: "1.5rem",
+        }}
+      >
         {[0, 1, 2].map((i) => (
           <div
             key={i}
@@ -90,7 +123,13 @@ export function JournalSection({ emptyState, viewAllLabel }: Props) {
 
   return (
     <>
-      <div style={{ display: "flex", flexDirection: "column", marginBottom: "1.5rem" }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          marginBottom: "1.5rem",
+        }}
+      >
         {articles.map((article, i) => {
           const coverUrl = strapiMediaUrl(article.cover?.url)
           return (
@@ -104,7 +143,9 @@ export function JournalSection({ emptyState, viewAllLabel }: Props) {
                 gap: "12px",
                 padding: "12px 0",
                 borderBottom:
-                  i < articles.length - 1 ? "1px solid var(--hairline)" : "none",
+                  i < articles.length - 1
+                    ? "1px solid var(--hairline)"
+                    : "none",
                 textDecoration: "none",
                 color: "inherit",
                 transition: "opacity 0.15s ease",
