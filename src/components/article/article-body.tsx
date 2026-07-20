@@ -7,85 +7,20 @@ import { Callout } from "./callout"
 import { Mermaid } from "./mermaid"
 import { CodeBlock } from "./code-block"
 import { InstagramEmbed } from "./instagram-embed"
+import { parseMarkdownBlocks } from "@/lib/markdown-blocks"
+import { createHeadingIdPlugin } from "@/lib/markdown-headings"
 
-type CalloutVariant = "info" | "warning" | "tip" | "success"
-
-type Block =
-  | { type: "md"; content: string }
-  | { type: "callout"; variant: CalloutVariant; content: string }
-  | { type: "instagram"; url: string }
-
-function parseBlocks(body: string): Block[] {
-  const blocks: Block[] = []
-  const lines = body.split("\n")
-  let buffer: string[] = []
-  let inCalloutType: CalloutVariant | null = null
-  let calloutBuffer: string[] = []
-  let inCodeBlock = false
-
-  const flushMd = () => {
-    if (buffer.length > 0) {
-      blocks.push({ type: "md", content: buffer.join("\n") })
-      buffer = []
-    }
-  }
-
-  for (const line of lines) {
-    if (line.trim().startsWith("```")) {
-      inCodeBlock = !inCodeBlock
-      if (inCalloutType) calloutBuffer.push(line)
-      else buffer.push(line)
-      continue
-    }
-
-    if (inCodeBlock) {
-      if (inCalloutType) calloutBuffer.push(line)
-      else buffer.push(line)
-      continue
-    }
-
-    const calloutStart = line.match(/^:::(info|warning|tip|success)\s*$/)
-    if (calloutStart && !inCalloutType) {
-      flushMd()
-      inCalloutType = calloutStart[1] as CalloutVariant
-      calloutBuffer = []
-      continue
-    }
-
-    if (line.trim() === ":::" && inCalloutType) {
-      blocks.push({
-        type: "callout",
-        variant: inCalloutType,
-        content: calloutBuffer.join("\n"),
-      })
-      inCalloutType = null
-      calloutBuffer = []
-      continue
-    }
-
-    if (inCalloutType) {
-      calloutBuffer.push(line)
-      continue
-    }
-
-    const igMatch = line.match(
-      /^https:\/\/(?:www\.)?instagram\.com\/(?:reel|p)\/[^\s?]+/,
-    )
-    if (igMatch) {
-      flushMd()
-      blocks.push({ type: "instagram", url: igMatch[0] })
-      continue
-    }
-
-    buffer.push(line)
-  }
-
-  flushMd()
-  return blocks
+interface ArticleBodyProps {
+  body: string
+  headingPrefix?: string
 }
 
-export async function ArticleBody({ body }: { body: string }) {
-  const blocks = parseBlocks(body)
+export async function ArticleBody({
+  body,
+  headingPrefix = "content",
+}: ArticleBodyProps) {
+  const blocks = parseMarkdownBlocks(body)
+  const headingPlugin = createHeadingIdPlugin(headingPrefix)
   const highlightedMap = new Map<string, string>()
 
   const collectHighlights = async (md: string) => {
@@ -128,6 +63,7 @@ export async function ArticleBody({ body }: { body: string }) {
               <MarkdownContent
                 content={block.content}
                 highlightedMap={highlightedMap}
+                headingPlugin={headingPlugin}
               />
             </Callout>
           )
@@ -137,6 +73,7 @@ export async function ArticleBody({ body }: { body: string }) {
             key={i}
             content={block.content}
             highlightedMap={highlightedMap}
+            headingPlugin={headingPlugin}
           />
         )
       })}
@@ -147,9 +84,11 @@ export async function ArticleBody({ body }: { body: string }) {
 function MarkdownContent({
   content,
   highlightedMap,
+  headingPlugin,
 }: {
   content: string
   highlightedMap: Map<string, string>
+  headingPlugin: ReturnType<typeof createHeadingIdPlugin>
 }) {
   const components: Components = {
     h2: ({ children, ...props }) => (
@@ -390,7 +329,7 @@ function MarkdownContent({
   return (
     <ReactMarkdown
       remarkPlugins={[remarkGfm]}
-      rehypePlugins={[rehypeSlug]}
+      rehypePlugins={[rehypeSlug, headingPlugin]}
       components={components}
     >
       {content}

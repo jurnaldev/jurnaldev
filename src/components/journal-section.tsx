@@ -1,102 +1,46 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import Link from "next/link"
 import { ImageOff } from "lucide-react"
-import { useLang, type Lang } from "@/contexts/lang-context"
+
+import { formatDateShort, formatEntryNumber } from "@/lib/article-utils"
+import { articlePath, journalPath, type Locale } from "@/lib/i18n/routing"
 import { strapiMediaUrl } from "@/lib/strapi"
-import {
-  formatDateShort,
-  formatEntryNumber,
-} from "@/lib/article-utils"
-import type { StrapiArticle, StrapiEmptyState } from "@/lib/strapi/types"
+import type { StrapiArticleSummary, StrapiEmptyState } from "@/lib/strapi/types"
 
 interface Props {
-  emptyState: Record<Lang, StrapiEmptyState>
-  viewAllLabel: Record<Lang, string>
+  articles: StrapiArticleSummary[]
+  emptyState: StrapiEmptyState
+  locale: Locale
+  viewAllLabel: string
 }
 
-export function JournalSection({ emptyState, viewAllLabel }: Props) {
-  const { lang } = useLang()
-  const [articles, setArticles] = useState<StrapiArticle[] | null>(null)
-
-  useEffect(() => {
-    let mounted = true
-    fetch(`/api/articles?locale=${lang}&limit=3`)
-      .then((r) => r.json())
-      .then((data) => {
-        if (mounted) setArticles(data.articles ?? [])
-      })
-      .catch(() => {
-        if (mounted) setArticles([])
-      })
-    return () => {
-      mounted = false
-    }
-  }, [lang])
-
-  if (articles !== null && articles.length === 0) {
-    return <EmptyState empty={emptyState[lang]} />
-  }
-
-  if (articles === null) {
-    return (
-      <div style={{ display: "flex", flexDirection: "column", marginBottom: "1.5rem" }}>
-        {[0, 1, 2].map((i) => (
-          <div
-            key={i}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-              padding: "12px 0",
-              borderBottom: i < 2 ? "1px solid var(--hairline)" : "none",
-              opacity: 0.4,
-            }}
-          >
-            <div
-              style={{
-                width: "56px",
-                height: "38px",
-                background: "var(--hairline)",
-                borderRadius: "6px",
-                flexShrink: 0,
-              }}
-            />
-            <div style={{ flex: 1 }}>
-              <div
-                style={{
-                  height: "9px",
-                  background: "var(--hairline)",
-                  borderRadius: "3px",
-                  marginBottom: "6px",
-                  width: "30%",
-                }}
-              />
-              <div
-                style={{
-                  height: "13px",
-                  background: "var(--hairline)",
-                  borderRadius: "3px",
-                  width: "75%",
-                }}
-              />
-            </div>
-          </div>
-        ))}
-      </div>
-    )
+export function JournalSection({
+  articles,
+  emptyState,
+  locale,
+  viewAllLabel,
+}: Props) {
+  if (articles.length === 0) {
+    return <EmptyState empty={emptyState} />
   }
 
   return (
     <>
-      <div style={{ display: "flex", flexDirection: "column", marginBottom: "1.5rem" }}>
-        {articles.map((article, i) => {
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          marginBottom: "1.5rem",
+        }}
+      >
+        {articles.map((article, index) => {
           const coverUrl = strapiMediaUrl(article.cover?.url)
+
           return (
             <Link
               key={article.id}
-              href={`/jurnal/${article.slug}`}
+              href={articlePath(locale, article.slug)}
               className="article-card-row card-enter"
               style={{
                 display: "flex",
@@ -104,14 +48,20 @@ export function JournalSection({ emptyState, viewAllLabel }: Props) {
                 gap: "12px",
                 padding: "12px 0",
                 borderBottom:
-                  i < articles.length - 1 ? "1px solid var(--hairline)" : "none",
+                  index < articles.length - 1
+                    ? "1px solid var(--hairline)"
+                    : "none",
                 textDecoration: "none",
                 color: "inherit",
                 transition: "opacity 0.15s ease",
-                animationDelay: `${i * 60}ms`,
+                animationDelay: `${index * 60}ms`,
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.7")}
-              onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+              onMouseEnter={(event) => {
+                event.currentTarget.style.opacity = "0.7"
+              }}
+              onMouseLeave={(event) => {
+                event.currentTarget.style.opacity = "1"
+              }}
             >
               {coverUrl ? (
                 <div
@@ -179,7 +129,7 @@ export function JournalSection({ emptyState, viewAllLabel }: Props) {
       </div>
 
       <Link
-        href="/jurnal"
+        href={journalPath(locale)}
         style={{
           display: "inline-flex",
           alignItems: "center",
@@ -193,10 +143,14 @@ export function JournalSection({ emptyState, viewAllLabel }: Props) {
           textDecoration: "none",
           transition: "opacity 0.15s ease",
         }}
-        onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.7")}
-        onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+        onMouseEnter={(event) => {
+          event.currentTarget.style.opacity = "0.7"
+        }}
+        onMouseLeave={(event) => {
+          event.currentTarget.style.opacity = "1"
+        }}
       >
-        {viewAllLabel[lang]}
+        {viewAllLabel}
       </Link>
     </>
   )

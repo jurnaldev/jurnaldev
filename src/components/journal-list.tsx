@@ -1,48 +1,61 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useLang } from "@/contexts/lang-context"
-import { SiteHeader } from "@/components/layout/site-header"
+
 import { ArticleCard } from "@/components/article/article-card"
-import type { StrapiArticle } from "@/lib/strapi/types"
+import { SiteHeader } from "@/components/layout/site-header"
+import { loadArticles } from "@/lib/client/load-articles"
+import type { Locale } from "@/lib/i18n/routing"
+import type { StrapiArticleSummary } from "@/lib/strapi/types"
 
 const copy = {
   en: {
     eyebrow: "Journal",
     title: "Notes from learning.",
     subtitle:
-      "A running log of what I'm learning as a backend engineer exploring AI. Unpolished, honest, mine.",
+      "A running log of me. My interest, my learning, my thoughts. It's all here, hope y'll enjoy it.",
     empty: "No entries yet. Check back soon.",
-    count: (n: number) => `${n} ${n === 1 ? "entry" : "entries"}`,
+    error: "Articles are temporarily unavailable. Try again.",
+    retry: "Try again",
+    count: (count: number) => `${count} ${count === 1 ? "entry" : "entries"}`,
   },
   id: {
     eyebrow: "Jurnal",
     title: "Catatan dari proses belajar.",
-    subtitle:
-      "Log berjalan dari apa yang gw pelajarin sebagai backend engineer yang lagi eksplor AI. Mentah, jujur, milik gw.",
+    subtitle: `"Log" gue. Minat gue, proses belajar gue, pemikiran gue. Semua ada di sini, semoga klean suka. ✌️`,
     empty: "Belum ada entry. Cek lagi nanti ya.",
-    count: (n: number) => `${n} ${n === 1 ? "entry" : "entries"}`,
+    error: "Artikel sementara tidak tersedia. Coba lagi.",
+    retry: "Coba lagi",
+    count: (count: number) => `${count} entries`,
   },
 }
 
-export default function JurnalListPage() {
-  const { lang } = useLang()
-  const t = copy[lang]
-  const [articles, setArticles] = useState<StrapiArticle[] | null>(null)
+export function JournalList({ locale }: { locale: Locale }) {
+  const t = copy[locale]
+  const [retry, setRetry] = useState(0)
+  const [result, setResult] = useState<{
+    status: "loading" | "success" | "error"
+    articles: StrapiArticleSummary[]
+  }>({ status: "loading", articles: [] })
 
   useEffect(() => {
-    let mounted = true
-    fetch(`/api/articles?locale=${lang}`)
-      .then((r) => r.json())
-      .then((data) => {
-        if (mounted) setArticles(data.articles ?? [])
+    const controller = new AbortController()
+    loadArticles(`/api/articles?locale=${locale}`, controller.signal)
+      .then((articles) => {
+        setResult({ status: "success", articles })
       })
-      .catch(() => { mounted = false })
-    return () => { mounted = false }
-  }, [lang])
+      .catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === "AbortError") return
+        setResult({ status: "error", articles: [] })
+      })
+    return () => controller.abort()
+  }, [locale, retry])
 
   return (
-    <main className="page-enter" style={{ minHeight: "100dvh", position: "relative" }}>
+    <main
+      className="page-enter"
+      style={{ minHeight: "100dvh", position: "relative" }}
+    >
       <div
         style={{
           position: "relative",
@@ -92,7 +105,7 @@ export default function JurnalListPage() {
           </p>
         </section>
 
-        {articles !== null && articles.length > 0 && (
+        {result.status === "success" && result.articles.length > 0 && (
           <div
             style={{
               fontFamily: "var(--font-geist-mono), monospace",
@@ -103,15 +116,24 @@ export default function JurnalListPage() {
               marginBottom: "4px",
             }}
           >
-            {t.count(articles.length)}
+            {t.count(result.articles.length)}
           </div>
         )}
 
         <div style={{ height: "1px", background: "var(--hairline)" }} />
 
-        {articles === null ? (
+        {result.status === "loading" ? (
           <LoadingList />
-        ) : articles.length === 0 ? (
+        ) : result.status === "error" ? (
+          <ErrorState
+            message={t.error}
+            retryLabel={t.retry}
+            onRetry={() => {
+              setResult({ status: "loading", articles: [] })
+              setRetry((value) => value + 1)
+            }}
+          />
+        ) : result.articles.length === 0 ? (
           <div
             style={{
               padding: "3rem 1.5rem",
@@ -125,15 +147,17 @@ export default function JurnalListPage() {
           </div>
         ) : (
           <div>
-            {articles.map((article, i) => (
+            {result.articles.map((article, index) => (
               <div
                 key={article.id}
                 style={{
                   borderBottom:
-                    i < articles.length - 1 ? "1px solid var(--hairline)" : "none",
+                    index < result.articles.length - 1
+                      ? "1px solid var(--hairline)"
+                      : "none",
                 }}
               >
-                <ArticleCard article={article} index={i} />
+                <ArticleCard article={article} index={index} locale={locale} />
               </div>
             ))}
           </div>
@@ -143,18 +167,37 @@ export default function JurnalListPage() {
   )
 }
 
+function ErrorState({
+  message,
+  retryLabel,
+  onRetry,
+}: {
+  message: string
+  retryLabel: string
+  onRetry: () => void
+}) {
+  return (
+    <div style={{ padding: "3rem 1.5rem", textAlign: "center" }}>
+      <p style={{ color: "var(--graphite)" }}>{message}</p>
+      <button type="button" onClick={onRetry}>
+        {retryLabel}
+      </button>
+    </div>
+  )
+}
+
 function LoadingList() {
   return (
     <div>
-      {[0, 1, 2].map((i) => (
+      {[0, 1, 2].map((index) => (
         <div
-          key={i}
+          key={index}
           style={{
             display: "flex",
             gap: "14px",
             alignItems: "flex-start",
             padding: "14px 0",
-            borderBottom: i < 2 ? "1px solid var(--hairline)" : "none",
+            borderBottom: index < 2 ? "1px solid var(--hairline)" : "none",
             opacity: 0.4,
           }}
         >

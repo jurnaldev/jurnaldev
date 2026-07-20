@@ -58,6 +58,7 @@ export function InstagramEmbed({ url }: { url: string }) {
       </div>
       <a
         href={url}
+        className="instagram-cta"
         target="_blank"
         rel="noopener noreferrer"
         style={{
@@ -69,14 +70,6 @@ export function InstagramEmbed({ url }: { url: string }) {
           borderRadius: "6px",
           textDecoration: "none",
           transition: "all 0.15s ease",
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.background = "var(--text)"
-          e.currentTarget.style.color = "var(--bg)"
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.background = "transparent"
-          e.currentTarget.style.color = "var(--text)"
         }}
       >
         Watch on Instagram →

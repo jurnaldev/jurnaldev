@@ -1,10 +1,12 @@
 import type {
   StrapiArticle,
+  StrapiArticleSummary,
   StrapiProject,
   StrapiLandingPage,
   StrapiSocialLink,
   StrapiListResponse,
   StrapiSingleResponse,
+  LocalizedSlugRecord,
   Locale,
 } from "./types"
 
@@ -14,6 +16,17 @@ const STRAPI_TOKEN = process.env.STRAPI_API_TOKEN || ""
 interface FetchOptions {
   next?: { revalidate?: number; tags?: string[] }
   cache?: RequestCache
+}
+
+export class StrapiHttpError extends Error {
+  constructor(
+    readonly status: number,
+    readonly url: string,
+    statusText: string,
+  ) {
+    super(`Strapi fetch failed: ${status} ${statusText} — ${url}`)
+    this.name = "StrapiHttpError"
+  }
 }
 
 async function strapiFetch<T>(
@@ -29,14 +42,13 @@ async function strapiFetch<T>(
 
   const res = await fetch(url, {
     headers,
+    signal: AbortSignal.timeout(8_000),
     next: options.next ?? { revalidate: 60 }, // ISR: 60s default
     cache: options.cache,
   })
 
   if (!res.ok) {
-    throw new Error(
-      `Strapi fetch failed: ${res.status} ${res.statusText} — ${url}`,
-    )
+    throw new StrapiHttpError(res.status, url, res.statusText)
   }
 
   return res.json()
@@ -48,6 +60,8 @@ async function strapiFetch<T>(
 export function strapiMediaUrl(url: string | undefined | null): string | null {
   if (!url) return null
   if (url.startsWith("http")) return url
+  if (url.startsWith("/mock/") || !process.env.NEXT_PUBLIC_STRAPI_URL)
+    return url
   return `${STRAPI_URL}${url}`
 }
 
@@ -56,10 +70,19 @@ export function strapiMediaUrl(url: string | undefined | null): string | null {
 export async function getArticles(
   locale: Locale = "en",
   options?: { limit?: number; featured?: boolean },
-): Promise<StrapiArticle[]> {
+): Promise<StrapiArticleSummary[]> {
   const params = new URLSearchParams({
     locale,
     "sort[0]": "publishedAt:desc",
+    "fields[0]": "documentId",
+    "fields[1]": "slug",
+    "fields[2]": "title",
+    "fields[3]": "excerpt",
+    "fields[4]": "publishedAt",
+    "fields[5]": "updatedAt",
+    "fields[6]": "locale",
+    "fields[7]": "featured",
+    "fields[8]": "entryNumber",
     "populate[cover]": "true",
     "populate[tags]": "true",
     "populate[author][populate]": "avatar",
@@ -67,7 +90,7 @@ export async function getArticles(
   if (options?.limit) params.set("pagination[limit]", String(options.limit))
   if (options?.featured) params.set("filters[featured][$eq]", "true")
 
-  const res = await strapiFetch<StrapiListResponse<StrapiArticle>>(
+  const res = await strapiFetch<StrapiListResponse<StrapiArticleSummary>>(
     `/articles?${params.toString()}`,
     { next: { revalidate: 60, tags: ["articles"] } },
   )
@@ -99,7 +122,7 @@ export async function getRelatedArticles(
   tagIds: number[],
   locale: Locale = "en",
   limit = 3,
-): Promise<StrapiArticle[]> {
+): Promise<StrapiArticleSummary[]> {
   if (!tagIds.length) return []
 
   const params = new URLSearchParams({
@@ -107,6 +130,15 @@ export async function getRelatedArticles(
     "sort[0]": "publishedAt:desc",
     "populate[cover]": "true",
     "populate[tags]": "true",
+    "fields[0]": "documentId",
+    "fields[1]": "slug",
+    "fields[2]": "title",
+    "fields[3]": "excerpt",
+    "fields[4]": "publishedAt",
+    "fields[5]": "updatedAt",
+    "fields[6]": "locale",
+    "fields[7]": "featured",
+    "fields[8]": "entryNumber",
     "filters[slug][$ne]": currentSlug,
     "pagination[limit]": String(limit),
   })
@@ -114,7 +146,7 @@ export async function getRelatedArticles(
     params.set(`filters[tags][id][$in][${i}]`, String(id))
   })
 
-  const res = await strapiFetch<StrapiListResponse<StrapiArticle>>(
+  const res = await strapiFetch<StrapiListResponse<StrapiArticleSummary>>(
     `/articles?${params.toString()}`,
     { next: { revalidate: 300 } },
   )
@@ -122,6 +154,21 @@ export async function getRelatedArticles(
 }
 
 // --- Project queries ---
+
+async function optionalProjectRead<T>(
+  read: () => Promise<T>,
+  emptyValue: T,
+): Promise<T> {
+  try {
+    return await read()
+  } catch (error) {
+    if (!(error instanceof StrapiHttpError) || error.status !== 404) throw error
+    console.warn(
+      "[strapi] projects collection unavailable (404); returning an empty result",
+    )
+    return emptyValue
+  }
+}
 
 export async function getProjects(
   locale: Locale = "en",
@@ -136,11 +183,13 @@ export async function getProjects(
     params.set("pagination[limit]", String(options.limit))
   if (options?.featured) params.set("filters[featured][$eq]", "true")
 
-  const res = await strapiFetch<StrapiListResponse<StrapiProject>>(
-    `/projects?${params.toString()}`,
-    { next: { revalidate: 60, tags: ["projects"] } },
-  )
-  return res.data
+  return optionalProjectRead(async () => {
+    const res = await strapiFetch<StrapiListResponse<StrapiProject>>(
+      `/projects?${params.toString()}`,
+      { next: { revalidate: 60, tags: ["projects"] } },
+    )
+    return res.data
+  }, [])
 }
 
 export async function getProjectBySlug(
@@ -155,11 +204,13 @@ export async function getProjectBySlug(
     "populate[localizations]": "true",
   })
 
-  const res = await strapiFetch<StrapiListResponse<StrapiProject>>(
-    `/projects?${params.toString()}`,
-    { next: { revalidate: 60, tags: [`project:${slug}`] } },
-  )
-  return res.data[0] ?? null
+  return optionalProjectRead(async () => {
+    const res = await strapiFetch<StrapiListResponse<StrapiProject>>(
+      `/projects?${params.toString()}`,
+      { next: { revalidate: 60, tags: [`project:${slug}`] } },
+    )
+    return res.data[0] ?? null
+  }, null)
 }
 
 // --- Landing page queries ---
@@ -196,27 +247,52 @@ export async function getSocialLinks(): Promise<StrapiSocialLink[]> {
   return res.data
 }
 
-export async function getAllSlugs(): Promise<
-  Array<{ slug: string; locale: Locale }>
-> {
-  const result: Array<{ slug: string; locale: Locale }> = []
+interface LocalizedSlugPayload {
+  documentId: string
+  slug: string
+  localizations?: Array<{ locale: Locale; slug: string }>
+}
+
+async function getAllLocalizedSlugs(
+  collection: "articles" | "projects",
+): Promise<LocalizedSlugRecord[]> {
+  const result: LocalizedSlugRecord[] = []
 
   for (const locale of ["en", "id"] as Locale[]) {
-    try {
-      const params = new URLSearchParams({
+    const params = new URLSearchParams({
+      locale,
+      "fields[0]": "documentId",
+      "fields[1]": "slug",
+      "populate[localizations][fields][0]": "locale",
+      "populate[localizations][fields][1]": "slug",
+      "pagination[limit]": "1000",
+    })
+    const res = await strapiFetch<StrapiListResponse<LocalizedSlugPayload>>(
+      `/${collection}?${params.toString()}`,
+      { next: { revalidate: 300 } },
+    )
+    res.data.forEach((record) =>
+      result.push({
+        documentId: record.documentId,
         locale,
-        "fields[0]": "slug",
-        "pagination[limit]": "1000",
-      })
-      const res = await strapiFetch<StrapiListResponse<{ slug: string }>>(
-        `/articles?${params.toString()}`,
-        { next: { revalidate: 300 } },
-      )
-      res.data.forEach((a) => result.push({ slug: a.slug, locale }))
-    } catch {
-      // Strapi offline — return empty so build doesn't fail
-    }
+        slug: record.slug,
+        localizations: (record.localizations ?? []).map(
+          ({ locale: localizationLocale, slug }) => ({
+            locale: localizationLocale,
+            slug,
+          }),
+        ),
+      }),
+    )
   }
 
   return result
+}
+
+export async function getAllSlugs(): Promise<LocalizedSlugRecord[]> {
+  return getAllLocalizedSlugs("articles")
+}
+
+export async function getAllProjectSlugs(): Promise<LocalizedSlugRecord[]> {
+  return optionalProjectRead(() => getAllLocalizedSlugs("projects"), [])
 }

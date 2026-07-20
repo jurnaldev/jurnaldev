@@ -1,17 +1,18 @@
 import type { Metadata } from "next"
+import { notFound } from "next/navigation"
+
 import { SiteHeader } from "@/components/layout/site-header"
-import { LocaleGate } from "@/components/locale-gate"
 import { FeaturedProject } from "@/components/portfolio/featured-project"
 import { ProjectRow } from "@/components/portfolio/project-row"
+import { buildPageAlternates } from "@/lib/i18n/metadata"
+import { isLocale, portfolioPath, type Locale } from "@/lib/i18n/routing"
 import { fetchProjects } from "@/lib/strapi"
 import type { StrapiProject } from "@/lib/strapi/types"
 
 export const revalidate = 60
 
-export const metadata: Metadata = {
-  title: "Portfolio",
-  description:
-    "Selected projects by Fahmi Hidayat — backend services, AI experiments, and side projects.",
+interface PortfolioPageProps {
+  params: Promise<{ locale: string }>
 }
 
 const copy = {
@@ -19,43 +20,64 @@ const copy = {
     eyebrow: "Portfolio",
     title: "Selected work.",
     subtitle:
-      "Projects I've built and shipped — production services, AI experiments, side projects.",
+      "Projects I've built in the past and present. Everything you can read here, from production-ready, AI experiments, to side projects.",
     empty: "No projects yet. Check back soon.",
     featuredLabel: "Featured",
-    count: (n: number) => `${n} ${n === 1 ? "project" : "projects"}`,
+    count: (count: number) =>
+      `${count} ${count === 1 ? "project" : "projects"}`,
   },
   id: {
     eyebrow: "Portofolio",
     title: "Karya pilihan.",
     subtitle:
-      "Project yang gw bikin dan rilis — service production, eksperimen AI, side project.",
+      "Project yang pernah/sedang gue build. Semuanya kalian bisa baca disini, dari yang udah di production, eksperimen AI, sampai side project.",
     empty: "Belum ada project. Cek lagi nanti ya.",
     featuredLabel: "Featured",
-    count: (n: number) => `${n} project`,
+    count: (count: number) => `${count} project`,
   },
+}
+
+export async function generateMetadata({
+  params,
+}: PortfolioPageProps): Promise<Metadata> {
+  const { locale: candidate } = await params
+  if (!isLocale(candidate)) notFound()
+
+  return {
+    title: candidate === "id" ? "Portofolio" : "Portfolio",
+    description: copy[candidate].subtitle,
+    alternates: buildPageAlternates({
+      canonicalPath: portfolioPath(candidate),
+      languages: {
+        en: portfolioPath("en"),
+        id: portfolioPath("id"),
+      },
+    }),
+  }
 }
 
 function splitProjects(projects: StrapiProject[]): {
   featured: StrapiProject | null
   rows: StrapiProject[]
 } {
-  const candidate = projects.find((p) => p.featured) ?? projects[0]
+  const candidate = projects.find((project) => project.featured) ?? projects[0]
   if (candidate?.cover) {
     return {
       featured: candidate,
-      rows: projects.filter((p) => p.id !== candidate.id),
+      rows: projects.filter((project) => project.id !== candidate.id),
     }
   }
   return { featured: null, rows: projects }
 }
 
 function ProjectList({
+  locale,
   projects,
-  t,
 }: {
+  locale: Locale
   projects: StrapiProject[]
-  t: (typeof copy)["en"]
 }) {
+  const t = copy[locale]
   const { featured, rows } = splitProjects(projects)
 
   return (
@@ -138,18 +160,24 @@ function ProjectList({
                   rows.length > 0 ? "1px solid var(--hairline)" : "none",
               }}
             >
-              <FeaturedProject project={featured} label={t.featuredLabel} />
+              <FeaturedProject
+                label={t.featuredLabel}
+                locale={locale}
+                project={featured}
+              />
             </div>
           )}
-          {rows.map((project, i) => (
+          {rows.map((project, index) => (
             <div
               key={project.id}
               style={{
                 borderBottom:
-                  i < rows.length - 1 ? "1px solid var(--hairline)" : "none",
+                  index < rows.length - 1
+                    ? "1px solid var(--hairline)"
+                    : "none",
               }}
             >
-              <ProjectRow project={project} />
+              <ProjectRow locale={locale} project={project} />
             </div>
           ))}
         </div>
@@ -158,11 +186,11 @@ function ProjectList({
   )
 }
 
-export default async function PortfolioPage() {
-  const [projectsEn, projectsId] = await Promise.all([
-    fetchProjects("en"),
-    fetchProjects("id"),
-  ])
+export default async function PortfolioPage({ params }: PortfolioPageProps) {
+  const { locale: candidate } = await params
+  if (!isLocale(candidate)) notFound()
+
+  const projects = await fetchProjects(candidate)
 
   return (
     <main
@@ -179,12 +207,7 @@ export default async function PortfolioPage() {
         }}
       >
         <SiteHeader />
-        <LocaleGate locale="en">
-          <ProjectList projects={projectsEn} t={copy.en} />
-        </LocaleGate>
-        <LocaleGate locale="id">
-          <ProjectList projects={projectsId} t={copy.id} />
-        </LocaleGate>
+        <ProjectList locale={candidate} projects={projects} />
       </div>
     </main>
   )

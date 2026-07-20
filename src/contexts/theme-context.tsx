@@ -4,7 +4,7 @@ import {
   createContext,
   useContext,
   useEffect,
-  useState,
+  useSyncExternalStore,
   ReactNode,
 } from "react"
 
@@ -14,51 +14,71 @@ export type ResolvedTheme = "light" | "dark"
 interface ThemeContextValue {
   theme: Theme
   resolvedTheme: ResolvedTheme
-  setTheme: (t: Theme) => void
+  setTheme: (theme: Theme) => void
 }
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined)
-
 const STORAGE_KEY = "jurnal-dev-theme"
+const CHANGE_EVENT = "jurnal-dev-theme-change"
+const MEDIA_QUERY = "(prefers-color-scheme: dark)"
+
+function getThemeSnapshot(): Theme {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY)
+    return stored === "light" || stored === "dark" || stored === "system"
+      ? stored
+      : "system"
+  } catch {
+    return "system"
+  }
+}
+
+function subscribeTheme(onStoreChange: () => void) {
+  window.addEventListener("storage", onStoreChange)
+  window.addEventListener(CHANGE_EVENT, onStoreChange)
+  return () => {
+    window.removeEventListener("storage", onStoreChange)
+    window.removeEventListener(CHANGE_EVENT, onStoreChange)
+  }
+}
+
+function getSystemDarkSnapshot() {
+  return window.matchMedia(MEDIA_QUERY).matches
+}
+
+function subscribeSystemTheme(onStoreChange: () => void) {
+  const media = window.matchMedia(MEDIA_QUERY)
+  media.addEventListener("change", onStoreChange)
+  return () => media.removeEventListener("change", onStoreChange)
+}
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("system")
-  const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>("dark")
+  const theme = useSyncExternalStore<Theme>(
+    subscribeTheme,
+    getThemeSnapshot,
+    () => "system",
+  )
+  const systemDark = useSyncExternalStore(
+    subscribeSystemTheme,
+    getSystemDarkSnapshot,
+    () => false,
+  )
+  const resolvedTheme: ResolvedTheme =
+    theme === "system" ? (systemDark ? "dark" : "light") : theme
 
-  // Load persisted theme
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY) as Theme | null
-    if (stored && ["light", "dark", "system"].includes(stored)) {
-      setThemeState(stored)
-    }
-  }, [])
+    const root = document.documentElement
+    root.classList.add("no-transitions")
+    root.classList.toggle("dark", resolvedTheme === "dark")
+    const frame = requestAnimationFrame(() => {
+      requestAnimationFrame(() => root.classList.remove("no-transitions"))
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [resolvedTheme])
 
-  // Resolve theme when it or system preference changes
-  useEffect(() => {
-    const mql = window.matchMedia("(prefers-color-scheme: dark)")
-    const resolve = () => {
-      const resolved: ResolvedTheme =
-        theme === "system" ? (mql.matches ? "dark" : "light") : theme
-      setResolvedTheme(resolved)
-
-      const root = document.documentElement
-      // Disable transitions during theme switch to prevent flash
-      root.classList.add("no-transitions")
-      if (resolved === "dark") root.classList.add("dark")
-      else root.classList.remove("dark")
-      // Re-enable after next frame
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => root.classList.remove("no-transitions"))
-      })
-    }
-    resolve()
-    mql.addEventListener("change", resolve)
-    return () => mql.removeEventListener("change", resolve)
-  }, [theme])
-
-  const setTheme = (t: Theme) => {
-    setThemeState(t)
-    localStorage.setItem(STORAGE_KEY, t)
+  const setTheme = (nextTheme: Theme) => {
+    localStorage.setItem(STORAGE_KEY, nextTheme)
+    window.dispatchEvent(new Event(CHANGE_EVENT))
   }
 
   return (
@@ -69,7 +89,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 }
 
 export function useTheme() {
-  const ctx = useContext(ThemeContext)
-  if (!ctx) throw new Error("useTheme must be used within ThemeProvider")
-  return ctx
+  const context = useContext(ThemeContext)
+  if (!context) throw new Error("useTheme must be used within ThemeProvider")
+  return context
 }

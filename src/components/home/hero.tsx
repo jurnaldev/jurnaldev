@@ -86,8 +86,7 @@ export function Hero({ data }: { data: StrapiLandingPage }) {
           maxWidth: "520px",
         }}
       >
-        {data.role}{" "}
-        <span style={{ color: "var(--stone)" }}>—</span>{" "}
+        {data.role} <span style={{ color: "var(--stone)" }}>|</span>{" "}
         <span style={{ color: "var(--ink)" }}>{data.tagline}</span>
       </p>
     </>

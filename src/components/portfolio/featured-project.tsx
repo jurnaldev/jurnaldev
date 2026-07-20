@@ -2,19 +2,22 @@ import Link from "next/link"
 import type { StrapiProject } from "@/lib/strapi/types"
 import { strapiMediaUrl } from "@/lib/strapi"
 import { Tag } from "@/components/ui/tag"
+import { projectPath, type Locale } from "@/lib/i18n/routing"
 
 export function FeaturedProject({
   project,
   label,
+  locale,
 }: {
   project: StrapiProject
   label: string
+  locale: Locale
 }) {
   const coverUrl = strapiMediaUrl(project.cover?.url)
   const number = String(project.order ?? 0).padStart(3, "0")
 
   return (
-    <Link href={`/portfolio/${project.slug}`} className="featured-project">
+    <Link href={projectPath(locale, project.slug)} className="featured-project">
       {coverUrl && (
         // eslint-disable-next-line @next/next/no-img-element
         <img

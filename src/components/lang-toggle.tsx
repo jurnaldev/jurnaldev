@@ -1,11 +1,46 @@
 "use client"
 
-import { useLang, type Lang } from "@/contexts/lang-context"
+import { usePathname } from "next/navigation"
 
-const options: Lang[] = ["en", "id"]
+import { useLang } from "@/contexts/lang-context"
+import {
+  locales,
+  replacePathLocale,
+  type Locale,
+} from "@/lib/i18n/routing"
 
-export function LangToggle() {
-  const { lang, setLang } = useLang()
+const localeNames: Record<Locale, string> = {
+  en: "English",
+  id: "Bahasa Indonesia",
+}
+
+export function LangToggle({
+  alternateHref,
+}: {
+  alternateHref?: string | null
+}): React.ReactNode {
+  const { lang } = useLang()
+  const pathname = usePathname()
+  const alternateLocale = lang === "en" ? "id" : "en"
+  const derivedHref = pathname
+    ? replacePathLocale(pathname, alternateLocale)
+    : null
+  const targetHref =
+    alternateHref === undefined ? derivedHref : alternateHref
+
+  const optionStyle = (active: boolean): React.CSSProperties => ({
+    padding: "6px 10px",
+    background: active ? "var(--text)" : "transparent",
+    color: active ? "var(--bg)" : "var(--text-muted)",
+    border: "none",
+    cursor: active ? "default" : "pointer",
+    textTransform: "uppercase",
+    letterSpacing: "0.05em",
+    transition: "all 0.15s ease",
+    fontFamily: "inherit",
+    fontSize: "inherit",
+    textDecoration: "none",
+  })
 
   return (
     <div
@@ -19,29 +54,47 @@ export function LangToggle() {
         fontSize: "11px",
       }}
     >
-      {options.map((l) => {
-        const isActive = lang === l
+      {locales.map((locale) => {
+        if (locale === lang) {
+          return (
+            <span
+              key={locale}
+              aria-current="page"
+              aria-label={`${localeNames[locale]} (current language)`}
+              style={optionStyle(true)}
+            >
+              {locale}
+            </span>
+          )
+        }
+
+        if (!targetHref) {
+          return (
+            <span
+              key={locale}
+              aria-disabled="true"
+              aria-label={`${localeNames[locale]}: Translation unavailable`}
+              title="Translation unavailable"
+              style={{
+                ...optionStyle(false),
+                cursor: "not-allowed",
+                opacity: 0.5,
+              }}
+            >
+              {locale}
+            </span>
+          )
+        }
+
         return (
-          <button
-            key={l}
-            onClick={() => setLang(l)}
-            aria-label={`Switch to ${l === "en" ? "English" : "Bahasa Indonesia"}`}
-            aria-pressed={isActive}
-            style={{
-              padding: "6px 10px",
-              background: isActive ? "var(--text)" : "transparent",
-              color: isActive ? "var(--bg)" : "var(--text-muted)",
-              border: "none",
-              cursor: "pointer",
-              textTransform: "uppercase",
-              letterSpacing: "0.05em",
-              transition: "all 0.15s ease",
-              fontFamily: "inherit",
-              fontSize: "inherit",
-            }}
+          <a
+            key={locale}
+            href={targetHref}
+            aria-label={`Switch to ${localeNames[locale]}`}
+            style={optionStyle(false)}
           >
-            {l}
-          </button>
+            {locale}
+          </a>
         )
       })}
     </div>

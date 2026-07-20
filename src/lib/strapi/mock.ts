@@ -1,8 +1,10 @@
 import type {
   StrapiArticle,
+  StrapiArticleSummary,
   StrapiProject,
   StrapiLandingPage,
   StrapiSocialLink,
+  LocalizedSlugRecord,
   Locale,
 } from "./types"
 
@@ -90,7 +92,7 @@ Follow di [@jurnal.dev](https://instagram.com/jurnal.dev) buat update harian.
 export const mockArticles: StrapiArticle[] = [
   {
     id: 1,
-    documentId: "mock-doc-1",
+    documentId: "mock-article-llm",
     slug: "pertama-kali-manggil-llm",
     title: "Pertama kali manggil LLM dari code",
     excerpt:
@@ -99,6 +101,14 @@ export const mockArticles: StrapiArticle[] = [
     publishedAt: "2026-04-18T10:00:00.000Z",
     updatedAt: "2026-04-18T10:00:00.000Z",
     locale: "id",
+    localizations: [
+      {
+        id: 2,
+        documentId: "mock-article-llm",
+        locale: "en",
+        slug: "my-first-llm-call",
+      },
+    ],
     entryNumber: 1,
     featured: true,
     cover: null,
@@ -116,7 +126,7 @@ export const mockArticles: StrapiArticle[] = [
   },
   {
     id: 2,
-    documentId: "mock-doc-2",
+    documentId: "mock-article-llm",
     slug: "my-first-llm-call",
     title: "My first LLM call, from scratch",
     excerpt:
@@ -125,6 +135,14 @@ export const mockArticles: StrapiArticle[] = [
     publishedAt: "2026-04-18T10:00:00.000Z",
     updatedAt: "2026-04-18T10:00:00.000Z",
     locale: "en",
+    localizations: [
+      {
+        id: 1,
+        documentId: "mock-article-llm",
+        locale: "id",
+        slug: "pertama-kali-manggil-llm",
+      },
+    ],
     entryNumber: 1,
     featured: true,
     cover: null,
@@ -142,7 +160,7 @@ export const mockArticles: StrapiArticle[] = [
   },
   {
     id: 3,
-    documentId: "mock-doc-3",
+    documentId: "mock-article-streaming",
     slug: "streaming-responses",
     title: "Streaming LLM responses tanpa ribet",
     excerpt:
@@ -151,6 +169,14 @@ export const mockArticles: StrapiArticle[] = [
     publishedAt: "2026-04-12T09:30:00.000Z",
     updatedAt: "2026-04-12T09:30:00.000Z",
     locale: "id",
+    localizations: [
+      {
+        id: 4,
+        documentId: "mock-article-streaming",
+        locale: "en",
+        slug: "streaming-responses-en",
+      },
+    ],
     entryNumber: 2,
     featured: false,
     cover: null,
@@ -167,7 +193,7 @@ export const mockArticles: StrapiArticle[] = [
   },
   {
     id: 4,
-    documentId: "mock-doc-4",
+    documentId: "mock-article-streaming",
     slug: "streaming-responses-en",
     title: "Streaming LLM responses, done right",
     excerpt:
@@ -176,6 +202,14 @@ export const mockArticles: StrapiArticle[] = [
     publishedAt: "2026-04-12T09:30:00.000Z",
     updatedAt: "2026-04-12T09:30:00.000Z",
     locale: "en",
+    localizations: [
+      {
+        id: 3,
+        documentId: "mock-article-streaming",
+        locale: "id",
+        slug: "streaming-responses",
+      },
+    ],
     entryNumber: 2,
     featured: false,
     cover: null,
@@ -222,6 +256,19 @@ export function getMockArticles(locale: "en" | "id" = "en"): StrapiArticle[] {
   return mockArticles.filter((a) => a.locale === locale)
 }
 
+export function toArticleSummary(article: StrapiArticle): StrapiArticleSummary {
+  const summary: Partial<StrapiArticle> = { ...article }
+  delete summary.body
+  delete summary.localizations
+  return summary as StrapiArticleSummary
+}
+
+export function getMockArticleSummaries(
+  locale: Locale = "en",
+): StrapiArticleSummary[] {
+  return getMockArticles(locale).map(toArticleSummary)
+}
+
 export function getMockArticleBySlug(
   slug: string,
   locale: "en" | "id" = "en",
@@ -229,6 +276,24 @@ export function getMockArticleBySlug(
   return (
     mockArticles.find((a) => a.slug === slug && a.locale === locale) ?? null
   )
+}
+
+function toLocalizedSlugRecord(
+  entity: StrapiArticle | StrapiProject,
+): LocalizedSlugRecord {
+  return {
+    documentId: entity.documentId,
+    locale: entity.locale,
+    slug: entity.slug,
+    localizations: (entity.localizations ?? []).map(({ locale, slug }) => ({
+      locale,
+      slug,
+    })),
+  }
+}
+
+export function getMockAllSlugs(): LocalizedSlugRecord[] {
+  return mockArticles.map(toLocalizedSlugRecord)
 }
 
 // --- Landing page mocks ---
@@ -373,7 +438,7 @@ const mockCover = {
 export const mockProjects: StrapiProject[] = [
   {
     id: 101,
-    documentId: "mock-project-1",
+    documentId: "mock-project-summarizer",
     slug: "jurnal-summarizer",
     title: "Jurnal Summarizer",
     excerpt:
@@ -387,6 +452,14 @@ export const mockProjects: StrapiProject[] = [
     publishedAt: "2026-05-01T10:00:00.000Z",
     updatedAt: "2026-05-01T10:00:00.000Z",
     locale: "en",
+    localizations: [
+      {
+        id: 102,
+        documentId: "mock-project-summarizer",
+        locale: "id",
+        slug: "perangkum-jurnal",
+      },
+    ],
     cover: mockCover,
     gallery: [mockCover, { ...mockCover, id: 902 }],
     featured: true,
@@ -394,8 +467,8 @@ export const mockProjects: StrapiProject[] = [
   },
   {
     id: 102,
-    documentId: "mock-project-1-id",
-    slug: "jurnal-summarizer",
+    documentId: "mock-project-summarizer",
+    slug: "perangkum-jurnal",
     title: "Jurnal Summarizer",
     excerpt:
       "Pipeline AI yang ngerangkum jurnal dev gw jadi brief mingguan pake LLM.",
@@ -408,6 +481,14 @@ export const mockProjects: StrapiProject[] = [
     publishedAt: "2026-05-01T10:00:00.000Z",
     updatedAt: "2026-05-01T10:00:00.000Z",
     locale: "id",
+    localizations: [
+      {
+        id: 101,
+        documentId: "mock-project-summarizer",
+        locale: "en",
+        slug: "jurnal-summarizer",
+      },
+    ],
     cover: mockCover,
     gallery: [mockCover, { ...mockCover, id: 902 }],
     featured: true,
@@ -415,7 +496,7 @@ export const mockProjects: StrapiProject[] = [
   },
   {
     id: 103,
-    documentId: "mock-project-2",
+    documentId: "mock-project-jurnal-dev",
     slug: "jurnal-dev",
     title: "jurnal.dev",
     excerpt:
@@ -429,6 +510,14 @@ export const mockProjects: StrapiProject[] = [
     publishedAt: "2026-04-20T10:00:00.000Z",
     updatedAt: "2026-04-20T10:00:00.000Z",
     locale: "en",
+    localizations: [
+      {
+        id: 104,
+        documentId: "mock-project-jurnal-dev",
+        locale: "id",
+        slug: "jurnal-dev",
+      },
+    ],
     cover: mockCover,
     gallery: [],
     featured: false,
@@ -436,7 +525,7 @@ export const mockProjects: StrapiProject[] = [
   },
   {
     id: 104,
-    documentId: "mock-project-2-id",
+    documentId: "mock-project-jurnal-dev",
     slug: "jurnal-dev",
     title: "jurnal.dev",
     excerpt:
@@ -450,6 +539,14 @@ export const mockProjects: StrapiProject[] = [
     publishedAt: "2026-04-20T10:00:00.000Z",
     updatedAt: "2026-04-20T10:00:00.000Z",
     locale: "id",
+    localizations: [
+      {
+        id: 103,
+        documentId: "mock-project-jurnal-dev",
+        locale: "en",
+        slug: "jurnal-dev",
+      },
+    ],
     cover: mockCover,
     gallery: [],
     featured: false,
@@ -457,7 +554,7 @@ export const mockProjects: StrapiProject[] = [
   },
   {
     id: 105,
-    documentId: "mock-project-3",
+    documentId: "mock-project-devlog-cli",
     slug: "devlog-cli",
     title: "devlog CLI",
     excerpt:
@@ -471,6 +568,14 @@ export const mockProjects: StrapiProject[] = [
     publishedAt: "2025-12-10T10:00:00.000Z",
     updatedAt: "2025-12-10T10:00:00.000Z",
     locale: "en",
+    localizations: [
+      {
+        id: 106,
+        documentId: "mock-project-devlog-cli",
+        locale: "id",
+        slug: "devlog-cli",
+      },
+    ],
     cover: null,
     gallery: [],
     featured: false,
@@ -478,11 +583,10 @@ export const mockProjects: StrapiProject[] = [
   },
   {
     id: 106,
-    documentId: "mock-project-3-id",
+    documentId: "mock-project-devlog-cli",
     slug: "devlog-cli",
     title: "devlog CLI",
-    excerpt:
-      "Tool terminal buat nyatet entry jurnal dev langsung dari shell.",
+    excerpt: "Tool terminal buat nyatet entry jurnal dev langsung dari shell.",
     body: sampleBody,
     year: 2025,
     status: "wip",
@@ -492,6 +596,14 @@ export const mockProjects: StrapiProject[] = [
     publishedAt: "2025-12-10T10:00:00.000Z",
     updatedAt: "2025-12-10T10:00:00.000Z",
     locale: "id",
+    localizations: [
+      {
+        id: 105,
+        documentId: "mock-project-devlog-cli",
+        locale: "en",
+        slug: "devlog-cli",
+      },
+    ],
     cover: null,
     gallery: [],
     featured: false,
@@ -510,4 +622,8 @@ export function getMockProjectBySlug(
   return (
     mockProjects.find((p) => p.slug === slug && p.locale === locale) ?? null
   )
+}
+
+export function getMockAllProjectSlugs(): LocalizedSlugRecord[] {
+  return mockProjects.map(toLocalizedSlugRecord)
 }

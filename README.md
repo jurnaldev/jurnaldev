@@ -34,9 +34,14 @@ things with them. I write notes from the messy middle at [jurnal.dev](https://ju
 
 #### Writing
 
-I publish journal entries on [jurnal.dev](https://jurnal.dev) — short notes
-about AI experiments, backend patterns, and lessons learned in production.
-Available in English and Bahasa Indonesia.
+I publish journal entries on [jurnal.dev/en/jurnal](https://jurnal.dev/en/jurnal)
+and [jurnal.dev/id/jurnal](https://jurnal.dev/id/jurnal) — short notes about
+AI experiments, backend patterns, and lessons learned in production.
+
+Public pages use locale-prefixed URLs (`/en` and `/id`). The URL is the source
+of truth for language; the language toggle navigates to the equivalent localized
+page and uses the translated slug for detail pages. Legacy unprefixed links
+remain valid through deterministic permanent `308` redirects.
 
 #### Connect
 
@@ -49,3 +54,20 @@ Available in English and Bahasa Indonesia.
 ---
 
 <sub>Crafted in Jakarta · learning in public · open to interesting collaborations</sub>
+
+#### Development
+
+The application uses pnpm and Node.js 20:
+
+```bash
+pnpm install
+pnpm dev
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build
+pnpm test:e2e
+git diff --check
+```
+
+See [DOCS.md](./DOCS.md) for architecture, CMS setup, testing, and deployment.

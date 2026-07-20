@@ -1,12 +1,15 @@
-import type { StrapiArticle } from "@/lib/strapi/types"
+import type { StrapiArticleSummary } from "@/lib/strapi/types"
+import type { Locale } from "@/lib/i18n/routing"
 import { ArticleCard } from "./article-card"
 
 export function RelatedArticles({
   articles,
   label,
+  locale,
 }: {
-  articles: StrapiArticle[]
+  articles: StrapiArticleSummary[]
   label: string
+  locale: Locale
 }) {
   if (articles.length === 0) return null
 
@@ -32,7 +35,12 @@ export function RelatedArticles({
         }}
       >
         {articles.map((article, i) => (
-          <ArticleCard key={article.id} article={article} index={i} />
+          <ArticleCard
+            key={article.id}
+            article={article}
+            locale={locale}
+            index={i}
+          />
         ))}
       </div>
     </section>

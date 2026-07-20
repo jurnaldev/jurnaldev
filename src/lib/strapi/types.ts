@@ -1,6 +1,15 @@
 // Strapi response types
 
-export type Locale = "en" | "id"
+import type { Locale } from "@/lib/i18n/routing"
+
+export type { Locale } from "@/lib/i18n/routing"
+
+export interface LocalizedSlugRecord {
+  documentId: string
+  locale: Locale
+  slug: string
+  localizations: Array<{ locale: Locale; slug: string }>
+}
 
 export interface StrapiImage {
   id: number
@@ -59,6 +68,23 @@ export interface StrapiArticle {
   featured?: boolean
   entryNumber?: number // e.g., 001, 002, 003
 }
+
+export type StrapiArticleSummary = Pick<
+  StrapiArticle,
+  | "id"
+  | "documentId"
+  | "slug"
+  | "title"
+  | "excerpt"
+  | "publishedAt"
+  | "updatedAt"
+  | "locale"
+  | "cover"
+  | "tags"
+  | "author"
+  | "featured"
+  | "entryNumber"
+>
 
 export type ProjectStatus = "live" | "wip" | "archived"
 

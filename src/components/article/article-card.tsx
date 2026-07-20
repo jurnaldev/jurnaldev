@@ -1,26 +1,24 @@
 import Link from "next/link"
 import { ImageOff } from "lucide-react"
-import type { StrapiArticle } from "@/lib/strapi/types"
-import {
-  formatDateShort,
-  formatEntryNumber,
-  calculateReadingTime,
-} from "@/lib/article-utils"
+import type { StrapiArticleSummary } from "@/lib/strapi/types"
+import { formatDateShort, formatEntryNumber } from "@/lib/article-utils"
 import { strapiMediaUrl } from "@/lib/strapi"
 import { Tag } from "@/components/ui/tag"
+import { articlePath, type Locale } from "@/lib/i18n/routing"
 
 export function ArticleCard({
   article,
+  locale = article.locale,
 }: {
-  article: StrapiArticle
+  article: StrapiArticleSummary
+  locale?: Locale
   index?: number
 }) {
   const coverUrl = strapiMediaUrl(article.cover?.url)
-  const readingTime = calculateReadingTime(article.body)
 
   return (
     <Link
-      href={`/jurnal/${article.slug}`}
+      href={articlePath(locale, article.slug)}
       className="article-card-row"
       style={{
         display: "flex",
@@ -31,8 +29,6 @@ export function ArticleCard({
         color: "inherit",
         transition: "opacity 0.15s ease",
       }}
-      onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.7")}
-      onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
     >
       {/* Thumbnail */}
       {coverUrl ? (
@@ -84,8 +80,6 @@ export function ArticleCard({
           <span>{formatEntryNumber(article.entryNumber)}</span>
           <span>·</span>
           <span>{formatDateShort(article.publishedAt, article.locale)}</span>
-          <span>·</span>
-          <span>{readingTime.text}</span>
         </div>
 
         <h3

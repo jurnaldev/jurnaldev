@@ -2,7 +2,7 @@
 
 Personal portfolio + journal platform untuk **@jurnal.dev** — Swiss/Helvetica minimal aesthetic dengan dark/light mode, EN/ID language toggle, dan headless CMS integration.
 
-Built with Next.js 15 (App Router), TypeScript, Tailwind CSS, Geist font, dan Strapi v5.
+Built with Next.js 16 (App Router), TypeScript, Tailwind CSS, Geist font, dan Strapi v5.
 
 ---
 
@@ -10,15 +10,15 @@ Built with Next.js 15 (App Router), TypeScript, Tailwind CSS, Geist font, dan St
 
 ```bash
 # 1. Install dependencies
-npm install
+pnpm install
 
 # 2. Copy env template (optional — works without Strapi using mock data)
 cp .env.example .env.local
 
 # 3. Run dev server
-npm run dev
+pnpm dev
 
-# Open http://localhost:3000
+# Open http://localhost:3000/en
 ```
 
 **Without Strapi**: App works out of the box with mock data (5 sample articles pre-loaded).
@@ -28,17 +28,36 @@ npm run dev
 
 ## Pages
 
-| Route            | Description                                               |
-| ---------------- | --------------------------------------------------------- |
-| `/`              | Landing page (hero, about, journal preview, lab, connect) |
-| `/jurnal`        | All journal entries (grid, filterable by locale)          |
-| `/jurnal/[slug]` | Individual article with TOC, related posts, share buttons |
+| Route                            | Description                                              |
+| -------------------------------- | -------------------------------------------------------- |
+| `/en`, `/id`                     | Localized landing page                                   |
+| `/en/jurnal`, `/id/jurnal`       | Journal entries for one locale                           |
+| `/[locale]/jurnal/[slug]`        | Localized article with TOC, related posts, share buttons |
+| `/en/portfolio`, `/id/portfolio` | Localized selected projects                              |
+| `/[locale]/portfolio/[slug]`     | Localized project case study                             |
+| `/api/articles?locale=en\|id`    | Unprefixed article API; contract unchanged               |
+
+The URL is the source of truth for language. Pages fetch and render only the
+requested locale. `LangProvider` exposes the validated route locale as read-only
+state, while the language toggle performs navigation. On detail pages it uses
+the translated entity's actual slug; if no translation exists, that locale
+control is disabled with an accessible “Translation unavailable” label.
+
+Legacy public URLs remain compatible through deterministic permanent `308`
+redirects. `/`, `/jurnal`, and `/portfolio` choose English. Legacy article and
+project slugs are checked in both locales, with English winning a collision;
+query strings are preserved and CMS failures propagate instead of becoming
+false `404` responses. There is no browser, cookie, or header language redirect.
+
+Canonical, hreflang, Open Graph, sitemap, and share URLs are locale-prefixed.
+Giscus keeps `mapping="specific"` with the localized stable `slug` as its term,
+preserving existing discussion identity.
 
 ---
 
 ## Tech stack
 
-- **Framework**: Next.js 15 (App Router, React 19)
+- **Framework**: Next.js 16 (App Router, React 19)
 - **Language**: TypeScript (strict)
 - **Styling**: Tailwind CSS + CSS variables (theme-aware)
 - **Fonts**: Geist Sans + Geist Mono
@@ -57,15 +76,15 @@ npm run dev
 jurnal-dev/
 ├── src/
 │   ├── app/
-│   │   ├── layout.tsx              # Root layout, fonts, providers, SEO
-│   │   ├── page.tsx                # Landing page
 │   │   ├── globals.css             # Theme variables, global styles
-│   │   ├── jurnal/
-│   │   │   ├── page.tsx            # /jurnal list
-│   │   │   └── [slug]/
-│   │   │       ├── page.tsx        # /jurnal/[slug] server component
-│   │   │       ├── article-view.tsx
-│   │   │       └── locale-gate.tsx
+│   │   ├── [locale]/
+│   │   │   ├── layout.tsx          # Root document, locale validation/providers
+│   │   │   ├── page.tsx            # /en and /id landing pages
+│   │   │   ├── jurnal/             # Localized list and article routes
+│   │   │   └── portfolio/          # Localized list and project routes
+│   │   ├── route.ts                # Legacy / → /en (308)
+│   │   ├── jurnal/                 # Legacy journal redirect handlers
+│   │   ├── portfolio/              # Legacy portfolio redirect handlers
 │   │   └── api/
 │   │       └── articles/
 │   │           └── route.ts        # /api/articles endpoint
@@ -170,7 +189,8 @@ Edit **`src/lib/content.ts`**:
 
 ### 2. Update metadata (SEO)
 
-Edit **`src/app/layout.tsx`** bagian `metadata`:
+Edit shared metadata in **`src/app/[locale]/layout.tsx`** and page-owned
+canonical/alternate metadata in the relevant localized `page.tsx`:
 
 - `metadataBase` — ubah ke domain production lu (default: `https://jurnal.dev`)
 - `title`, `description`, `keywords`
@@ -207,27 +227,14 @@ Opsi B — edit SVG: langsung modify path/circle di `avatar.tsx`.
 
 Edit **`src/components/code-snippet.tsx`** — semua content-nya inline di JSX. Ganti ke snippet favorite lu (agentic workflow, MCP tool, whatever). Filename di header juga bisa diganti.
 
-### 5. Tambah real journal entries
+### 5. Tambah journal entries
 
-Sekarang pake empty state. Untuk upgrade ke real entries:
-
-1. Buat data source (bisa simple array di `src/lib/journal.ts`, atau MDX, atau fetch dari Strapi/Notion)
-2. Edit **`src/components/journal-section.tsx`** — replace skeleton cards dengan real entry cards
-3. Consider add `src/app/jurnal/[slug]/page.tsx` untuk individual post pages
-
-Example data shape:
-
-```ts
-export const entries = [
-  {
-    slug: "rag-basics",
-    title: "RAG, tapi beneran",
-    excerpt: "Ngoprek retrieval augmented generation...",
-    date: "2026-05-01",
-    cover: "/covers/rag.jpg", // atau gradient string
-  },
-]
-```
+Artikel sudah dibaca dari Strapi v5, atau dari fixture
+`src/lib/strapi/mock.ts` ketika URL CMS tidak dikonfigurasi. Buat versi EN/ID
+melalui localization relationship Strapi dan beri setiap versi slug yang nyata.
+Halaman detail akan mengambil satu locale dari URL; hubungan localization hanya
+dipakai untuk hreflang dan tujuan language toggle. Untuk fixture lokal, jaga
+`documentId` pasangan tetap sama dan isi `localizations` secara reciprocal.
 
 ### 6. Color palette
 
@@ -242,7 +249,7 @@ Change `--bg`, `--text`, `--border`, etc., dan sisanya auto-propagate.
 
 Default pake Geist Sans + Mono. Kalau mau ganti:
 
-1. Edit **`src/app/layout.tsx`** — ganti `GeistSans`/`GeistMono` import dari `next/font/google` atau `next/font/local`
+1. Edit **`src/app/[locale]/layout.tsx`** — ganti `GeistSans`/`GeistMono` import
 2. Update CSS variable name di `globals.css` dan `tailwind.config.mjs` kalau perlu
 
 ---
@@ -273,9 +280,9 @@ Setelah deploy:
 FROM node:20-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci
+RUN corepack enable && pnpm install --frozen-lockfile
 COPY . .
-RUN npm run build
+RUN pnpm build
 
 FROM node:20-alpine
 WORKDIR /app
@@ -284,24 +291,31 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/node_modules ./node_modules
 EXPOSE 3000
-CMD ["npm", "start"]
+CMD ["pnpm", "start"]
 ```
 
 Pair dengan Cloudflare Tunnel atau Traefik reverse proxy.
 
-### Static export (optional)
-
-Kalau landing page ini fully static (ga ada dynamic data), bisa export ke plain HTML:
-
-```js
-// next.config.mjs
-export default { output: "export" }
-```
+### Verification
 
 ```bash
-npm run build
-# Output di /out — deploy ke Cloudflare Pages, GitHub Pages, Netlify, dll
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build
+pnpm test:e2e
+git diff --check
 ```
+
+Vitest unit tests live beside source files. Playwright smoke tests live in
+`tests/e2e/`. When Strapi is configured, CMS failures are surfaced; bundled
+mock fallback after a CMS failure must be explicitly enabled with
+`STRAPI_MOCK_FALLBACK=true` and is intended only for preview/demo environments.
+The narrow exception is a 404 from the optional `projects` collection: project
+lists and slug enumeration return empty arrays, while detail reads return
+`null`, until the collection is deployed. This exception does not apply to
+401/403 responses, 5xx responses, timeouts, network failures, or other Strapi
+resources.
 
 ---
 
@@ -310,7 +324,7 @@ npm run build
 - ✅ **Theme system**: Light / Dark / System (follows `prefers-color-scheme`)
 - ✅ **Anti-flash**: Inline script sets theme before hydration
 - ✅ **Theme persistence**: Saves preference to localStorage
-- ✅ **i18n**: EN / ID toggle with browser locale auto-detection
+- ✅ **i18n**: URL-derived EN/ID routes with navigation-based language toggle
 - ✅ **SEO**: Open Graph, Twitter cards, proper metadata
 - ✅ **Responsive**: Works on mobile, tablet, desktop
 - ✅ **A11y**: Proper ARIA labels, semantic HTML, keyboard nav
@@ -323,8 +337,6 @@ npm run build
 
 Kalau lu mau grow landing page ini:
 
-- [ ] Add `/jurnal` route untuk list semua journal entries
-- [ ] Add `/jurnal/[slug]` untuk individual posts (MDX support)
 - [ ] RSS feed (`/rss.xml`) untuk subscribers
 - [ ] Integrate dengan Instagram Graph API untuk pull reels latest
 - [ ] Newsletter signup (Buttondown / ConvertKit)

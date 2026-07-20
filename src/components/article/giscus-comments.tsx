@@ -1,11 +1,12 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useSyncExternalStore } from "react"
 import { MessageCircle } from "lucide-react"
 import Giscus from "@giscus/react"
 
 import { useTheme } from "@/contexts/theme-context"
 import { useLang } from "@/contexts/lang-context"
+import { SITE_URL } from "@/lib/site"
 
 const labels = {
   en: { comments: "Discussion" },
@@ -15,11 +16,11 @@ const labels = {
 export function GiscusComments({ slug }: { slug: string }) {
   const { resolvedTheme } = useTheme()
   const { lang } = useLang()
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  const mounted = useSyncExternalStore(
+    () => () => undefined,
+    () => true,
+    () => false,
+  )
 
   const repo = process.env.NEXT_PUBLIC_GISCUS_REPO
   const repoId = process.env.NEXT_PUBLIC_GISCUS_REPO_ID
@@ -36,8 +37,8 @@ export function GiscusComments({ slug }: { slug: string }) {
   // Custom themes hosted at /public — Giscus fetches these by URL
   const themeUrl =
     resolvedTheme === "dark"
-      ? "https://jurnal.dev/giscus-theme-dark.css"
-      : "https://jurnal.dev/giscus-theme-light.css"
+      ? `${SITE_URL}/giscus-theme-dark.css`
+      : `${SITE_URL}/giscus-theme-light.css`
 
   return (
     <div
