@@ -1,5 +1,15 @@
-import { describe, expect, it, vi } from "vitest"
-import { getAllProjectSlugs, getAllSlugs, getArticles } from "./client"
+import { afterEach, describe, expect, it, vi } from "vitest"
+import {
+  getAllProjectSlugs,
+  getAllSlugs,
+  getArticles,
+  getProjectBySlug,
+  getProjects,
+} from "./client"
+
+afterEach(() => {
+  vi.unstubAllGlobals()
+})
 
 describe("Strapi article summaries", () => {
   it("uses an eight-second timeout and excludes body from list fields", async () => {
@@ -96,6 +106,55 @@ describe("Strapi localized slug enumeration", () => {
     const records = await getAllSlugs()
     expect(records.every((record) => record.localizations.length === 0)).toBe(
       true,
+    )
+  })
+})
+
+describe("optional Strapi project collection", () => {
+  function stubResponse(status: number, statusText: string) {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(new Response(null, { status, statusText })),
+    )
+  }
+
+  it("returns an empty project list when the collection is missing", async () => {
+    stubResponse(404, "Not Found")
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined)
+
+    await expect(getProjects("en")).resolves.toEqual([])
+    expect(warn).toHaveBeenCalledWith(
+      "[strapi] projects collection unavailable (404); returning an empty result",
+    )
+  })
+
+  it("returns null for project detail when the collection is missing", async () => {
+    stubResponse(404, "Not Found")
+    vi.spyOn(console, "warn").mockImplementation(() => undefined)
+
+    await expect(getProjectBySlug("missing", "en")).resolves.toBeNull()
+  })
+
+  it("returns no project slugs when the collection is missing", async () => {
+    stubResponse(404, "Not Found")
+    vi.spyOn(console, "warn").mockImplementation(() => undefined)
+
+    await expect(getAllProjectSlugs()).resolves.toEqual([])
+  })
+
+  it("still rejects non-404 project failures", async () => {
+    stubResponse(500, "Internal Server Error")
+
+    await expect(getProjects("en")).rejects.toThrow(
+      "Strapi fetch failed: 500 Internal Server Error",
+    )
+  })
+
+  it("still rejects 404 responses from non-project resources", async () => {
+    stubResponse(404, "Not Found")
+
+    await expect(getArticles("en")).rejects.toThrow(
+      "Strapi fetch failed: 404 Not Found",
     )
   })
 })

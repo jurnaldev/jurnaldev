@@ -18,6 +18,17 @@ interface FetchOptions {
   cache?: RequestCache
 }
 
+export class StrapiHttpError extends Error {
+  constructor(
+    readonly status: number,
+    readonly url: string,
+    statusText: string,
+  ) {
+    super(`Strapi fetch failed: ${status} ${statusText} — ${url}`)
+    this.name = "StrapiHttpError"
+  }
+}
+
 async function strapiFetch<T>(
   path: string,
   options: FetchOptions = {},
@@ -37,9 +48,7 @@ async function strapiFetch<T>(
   })
 
   if (!res.ok) {
-    throw new Error(
-      `Strapi fetch failed: ${res.status} ${res.statusText} — ${url}`,
-    )
+    throw new StrapiHttpError(res.status, url, res.statusText)
   }
 
   return res.json()
@@ -146,6 +155,21 @@ export async function getRelatedArticles(
 
 // --- Project queries ---
 
+async function optionalProjectRead<T>(
+  read: () => Promise<T>,
+  emptyValue: T,
+): Promise<T> {
+  try {
+    return await read()
+  } catch (error) {
+    if (!(error instanceof StrapiHttpError) || error.status !== 404) throw error
+    console.warn(
+      "[strapi] projects collection unavailable (404); returning an empty result",
+    )
+    return emptyValue
+  }
+}
+
 export async function getProjects(
   locale: Locale = "en",
   options?: { limit?: number; featured?: boolean },
@@ -159,11 +183,13 @@ export async function getProjects(
     params.set("pagination[limit]", String(options.limit))
   if (options?.featured) params.set("filters[featured][$eq]", "true")
 
-  const res = await strapiFetch<StrapiListResponse<StrapiProject>>(
-    `/projects?${params.toString()}`,
-    { next: { revalidate: 60, tags: ["projects"] } },
-  )
-  return res.data
+  return optionalProjectRead(async () => {
+    const res = await strapiFetch<StrapiListResponse<StrapiProject>>(
+      `/projects?${params.toString()}`,
+      { next: { revalidate: 60, tags: ["projects"] } },
+    )
+    return res.data
+  }, [])
 }
 
 export async function getProjectBySlug(
@@ -178,11 +204,13 @@ export async function getProjectBySlug(
     "populate[localizations]": "true",
   })
 
-  const res = await strapiFetch<StrapiListResponse<StrapiProject>>(
-    `/projects?${params.toString()}`,
-    { next: { revalidate: 60, tags: [`project:${slug}`] } },
-  )
-  return res.data[0] ?? null
+  return optionalProjectRead(async () => {
+    const res = await strapiFetch<StrapiListResponse<StrapiProject>>(
+      `/projects?${params.toString()}`,
+      { next: { revalidate: 60, tags: [`project:${slug}`] } },
+    )
+    return res.data[0] ?? null
+  }, null)
 }
 
 // --- Landing page queries ---
@@ -266,5 +294,5 @@ export async function getAllSlugs(): Promise<LocalizedSlugRecord[]> {
 }
 
 export async function getAllProjectSlugs(): Promise<LocalizedSlugRecord[]> {
-  return getAllLocalizedSlugs("projects")
+  return optionalProjectRead(() => getAllLocalizedSlugs("projects"), [])
 }
