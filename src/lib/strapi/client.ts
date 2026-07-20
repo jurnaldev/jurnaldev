@@ -6,6 +6,7 @@ import type {
   StrapiSocialLink,
   StrapiListResponse,
   StrapiSingleResponse,
+  LocalizedSlugRecord,
   Locale,
 } from "./types"
 
@@ -50,7 +51,8 @@ async function strapiFetch<T>(
 export function strapiMediaUrl(url: string | undefined | null): string | null {
   if (!url) return null
   if (url.startsWith("http")) return url
-  if (url.startsWith("/mock/") || !process.env.NEXT_PUBLIC_STRAPI_URL) return url
+  if (url.startsWith("/mock/") || !process.env.NEXT_PUBLIC_STRAPI_URL)
+    return url
   return `${STRAPI_URL}${url}`
 }
 
@@ -217,42 +219,52 @@ export async function getSocialLinks(): Promise<StrapiSocialLink[]> {
   return res.data
 }
 
-export async function getAllSlugs(): Promise<
-  Array<{ slug: string; locale: Locale }>
-> {
-  const result: Array<{ slug: string; locale: Locale }> = []
+interface LocalizedSlugPayload {
+  documentId: string
+  slug: string
+  localizations?: Array<{ locale: Locale; slug: string }>
+}
+
+async function getAllLocalizedSlugs(
+  collection: "articles" | "projects",
+): Promise<LocalizedSlugRecord[]> {
+  const result: LocalizedSlugRecord[] = []
 
   for (const locale of ["en", "id"] as Locale[]) {
     const params = new URLSearchParams({
       locale,
-      "fields[0]": "slug",
+      "fields[0]": "documentId",
+      "fields[1]": "slug",
+      "populate[localizations][fields][0]": "locale",
+      "populate[localizations][fields][1]": "slug",
       "pagination[limit]": "1000",
     })
-    const res = await strapiFetch<StrapiListResponse<{ slug: string }>>(
-      `/articles?${params.toString()}`,
+    const res = await strapiFetch<StrapiListResponse<LocalizedSlugPayload>>(
+      `/${collection}?${params.toString()}`,
       { next: { revalidate: 300 } },
     )
-    res.data.forEach((a) => result.push({ slug: a.slug, locale }))
+    res.data.forEach((record) =>
+      result.push({
+        documentId: record.documentId,
+        locale,
+        slug: record.slug,
+        localizations: (record.localizations ?? []).map(
+          ({ locale: localizationLocale, slug }) => ({
+            locale: localizationLocale,
+            slug,
+          }),
+        ),
+      }),
+    )
   }
 
   return result
 }
 
-export async function getAllProjectSlugs(): Promise<
-  Array<{ slug: string; locale: Locale }>
-> {
-  const result: Array<{ slug: string; locale: Locale }> = []
-  for (const locale of ["en", "id"] as Locale[]) {
-    const params = new URLSearchParams({
-      locale,
-      "fields[0]": "slug",
-      "pagination[limit]": "1000",
-    })
-    const res = await strapiFetch<StrapiListResponse<{ slug: string }>>(
-      `/projects?${params.toString()}`,
-      { next: { revalidate: 300 } },
-    )
-    res.data.forEach((project) => result.push({ slug: project.slug, locale }))
-  }
-  return result
+export async function getAllSlugs(): Promise<LocalizedSlugRecord[]> {
+  return getAllLocalizedSlugs("articles")
+}
+
+export async function getAllProjectSlugs(): Promise<LocalizedSlugRecord[]> {
+  return getAllLocalizedSlugs("projects")
 }

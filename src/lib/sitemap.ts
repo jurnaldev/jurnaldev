@@ -1,32 +1,90 @@
 import type { MetadataRoute } from "next"
-import type { Locale } from "@/lib/strapi/types"
-import { SITE_URL } from "./site"
+import {
+  articlePath,
+  homePath,
+  journalPath,
+  locales,
+  portfolioPath,
+  projectPath,
+  type Locale,
+} from "@/lib/i18n/routing"
+import type { LocalizedSlugRecord } from "@/lib/strapi/types"
+import { absoluteUrl } from "./site"
 
-type Slug = { slug: string; locale: Locale }
-type SlugLoader = () => Promise<Slug[]>
+type SlugLoader = () => Promise<LocalizedSlugRecord[]>
+
+function groupLanguages(
+  records: LocalizedSlugRecord[],
+  buildPath: (locale: Locale, slug: string) => string,
+): Map<string, Partial<Record<Locale, string>>> {
+  const groups = new Map<string, Partial<Record<Locale, string>>>()
+
+  for (const record of records) {
+    const languages = groups.get(record.documentId) ?? {}
+    languages[record.locale] = absoluteUrl(
+      buildPath(record.locale, record.slug),
+    )
+    for (const localization of record.localizations) {
+      languages[localization.locale] = absoluteUrl(
+        buildPath(localization.locale, localization.slug),
+      )
+    }
+    groups.set(record.documentId, languages)
+  }
+
+  return groups
+}
 
 export async function buildSitemapEntries(
   articleLoader: SlugLoader,
   projectLoader: SlugLoader,
 ): Promise<MetadataRoute.Sitemap> {
   const entries = new Map<string, MetadataRoute.Sitemap[number]>()
-  const add = (path: string, priority: number) => {
-    const url = `${SITE_URL}${path}`
-    entries.set(url, { url, lastModified: new Date(), priority })
+  const add = (
+    path: string,
+    priority: number,
+    languages?: Partial<Record<Locale, string>>,
+  ) => {
+    const url = absoluteUrl(path)
+    entries.set(url, {
+      url,
+      lastModified: new Date(),
+      priority,
+      ...(languages ? { alternates: { languages } } : {}),
+    })
   }
-  add("/", 1)
-  add("/jurnal", 0.8)
-  add("/portfolio", 0.8)
+
+  const homeLanguages = Object.fromEntries(
+    locales.map((locale) => [locale, absoluteUrl(homePath(locale))]),
+  ) as Record<Locale, string>
+  const journalLanguages = Object.fromEntries(
+    locales.map((locale) => [locale, absoluteUrl(journalPath(locale))]),
+  ) as Record<Locale, string>
+  const portfolioLanguages = Object.fromEntries(
+    locales.map((locale) => [locale, absoluteUrl(portfolioPath(locale))]),
+  ) as Record<Locale, string>
+
+  for (const locale of locales) {
+    add(homePath(locale), 1, homeLanguages)
+    add(journalPath(locale), 0.8, journalLanguages)
+    add(portfolioPath(locale), 0.8, portfolioLanguages)
+  }
 
   try {
     const articles = await articleLoader()
-    articles.forEach(({ slug }) => add(`/jurnal/${slug}`, 0.7))
+    const groups = groupLanguages(articles, articlePath)
+    articles.forEach(({ documentId, locale, slug }) =>
+      add(articlePath(locale, slug), 0.7, groups.get(documentId)),
+    )
   } catch (error) {
     console.error("[sitemap] article slugs unavailable", error)
   }
   try {
     const projects = await projectLoader()
-    projects.forEach(({ slug }) => add(`/portfolio/${slug}`, 0.7))
+    const groups = groupLanguages(projects, projectPath)
+    projects.forEach(({ documentId, locale, slug }) =>
+      add(projectPath(locale, slug), 0.7, groups.get(documentId)),
+    )
   } catch (error) {
     console.error("[sitemap] project slugs unavailable", error)
   }

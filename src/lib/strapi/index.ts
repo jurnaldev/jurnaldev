@@ -1,5 +1,6 @@
 import type {
   Locale,
+  LocalizedSlugRecord,
   StrapiArticle,
   StrapiArticleSummary,
   StrapiProject,
@@ -86,11 +87,9 @@ export async function fetchRelatedArticles(
   )
 }
 
-export async function fetchAllSlugs(): Promise<
-  Array<{ slug: string; locale: Locale }>
-> {
+export async function fetchAllSlugs(): Promise<LocalizedSlugRecord[]> {
   return fromSource(
-    () => mock.mockArticles.map((a) => ({ slug: a.slug, locale: a.locale })),
+    () => mock.getMockAllSlugs(),
     () => client.getAllSlugs(),
   )
 }
@@ -115,11 +114,9 @@ export async function fetchProjectBySlug(
   )
 }
 
-export async function fetchAllProjectSlugs(): Promise<
-  Array<{ slug: string; locale: Locale }>
-> {
+export async function fetchAllProjectSlugs(): Promise<LocalizedSlugRecord[]> {
   return fromSource(
-    () => mock.mockProjects.map((p) => ({ slug: p.slug, locale: p.locale })),
+    () => mock.getMockAllProjectSlugs(),
     () => client.getAllProjectSlugs(),
   )
 }
