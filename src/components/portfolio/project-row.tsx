@@ -1,12 +1,19 @@
 import Link from "next/link"
 import type { StrapiProject } from "@/lib/strapi/types"
+import { projectPath, type Locale } from "@/lib/i18n/routing"
 import { STATUS_LABEL } from "./status-label"
 
-export function ProjectRow({ project }: { project: StrapiProject }) {
+export function ProjectRow({
+  project,
+  locale,
+}: {
+  project: StrapiProject
+  locale: Locale
+}) {
   const number = String(project.order ?? 0).padStart(3, "0")
 
   return (
-    <Link href={`/portfolio/${project.slug}`} className="project-row">
+    <Link href={projectPath(locale, project.slug)} className="project-row">
       <span
         style={{
           fontFamily: "var(--font-geist-mono), monospace",

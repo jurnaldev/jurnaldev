@@ -1,11 +1,12 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useLang } from "@/contexts/lang-context"
-import { SiteHeader } from "@/components/layout/site-header"
+
 import { ArticleCard } from "@/components/article/article-card"
-import type { StrapiArticleSummary } from "@/lib/strapi/types"
+import { SiteHeader } from "@/components/layout/site-header"
 import { loadArticles } from "@/lib/client/load-articles"
+import type { Locale } from "@/lib/i18n/routing"
+import type { StrapiArticleSummary } from "@/lib/strapi/types"
 
 const copy = {
   en: {
@@ -14,7 +15,9 @@ const copy = {
     subtitle:
       "A running log of what I'm learning as a backend engineer exploring AI. Unpolished, honest, mine.",
     empty: "No entries yet. Check back soon.",
-    count: (n: number) => `${n} ${n === 1 ? "entry" : "entries"}`,
+    error: "Articles are temporarily unavailable. Try again.",
+    retry: "Try again",
+    count: (count: number) => `${count} ${count === 1 ? "entry" : "entries"}`,
   },
   id: {
     eyebrow: "Jurnal",
@@ -22,37 +25,32 @@ const copy = {
     subtitle:
       "Log berjalan dari apa yang gw pelajarin sebagai backend engineer yang lagi eksplor AI. Mentah, jujur, milik gw.",
     empty: "Belum ada entry. Cek lagi nanti ya.",
-    count: (n: number) => `${n} ${n === 1 ? "entry" : "entries"}`,
+    error: "Artikel sementara tidak tersedia. Coba lagi.",
+    retry: "Coba lagi",
+    count: (count: number) => `${count} entries`,
   },
 }
 
-export default function JurnalListPage() {
-  const { lang } = useLang()
-  const t = copy[lang]
+export function JournalList({ locale }: { locale: Locale }) {
+  const t = copy[locale]
   const [retry, setRetry] = useState(0)
   const [result, setResult] = useState<{
-    lang: string
     status: "loading" | "success" | "error"
     articles: StrapiArticleSummary[]
-  }>({ lang, status: "loading", articles: [] })
-  const current =
-    result.lang === lang
-      ? result
-      : { lang, status: "loading" as const, articles: [] }
-  const articles = current.articles
+  }>({ status: "loading", articles: [] })
 
   useEffect(() => {
     const controller = new AbortController()
-    loadArticles(`/api/articles?locale=${lang}`, controller.signal)
-      .then((nextArticles) => {
-        setResult({ lang, status: "success", articles: nextArticles })
+    loadArticles(`/api/articles?locale=${locale}`, controller.signal)
+      .then((articles) => {
+        setResult({ status: "success", articles })
       })
       .catch((error: unknown) => {
         if (error instanceof DOMException && error.name === "AbortError") return
-        setResult({ lang, status: "error", articles: [] })
+        setResult({ status: "error", articles: [] })
       })
     return () => controller.abort()
-  }, [lang, retry])
+  }, [locale, retry])
 
   return (
     <main
@@ -108,7 +106,7 @@ export default function JurnalListPage() {
           </p>
         </section>
 
-        {current.status === "success" && articles.length > 0 && (
+        {result.status === "success" && result.articles.length > 0 && (
           <div
             style={{
               fontFamily: "var(--font-geist-mono), monospace",
@@ -119,28 +117,24 @@ export default function JurnalListPage() {
               marginBottom: "4px",
             }}
           >
-            {t.count(articles.length)}
+            {t.count(result.articles.length)}
           </div>
         )}
 
         <div style={{ height: "1px", background: "var(--hairline)" }} />
 
-        {current.status === "loading" ? (
+        {result.status === "loading" ? (
           <LoadingList />
-        ) : current.status === "error" ? (
+        ) : result.status === "error" ? (
           <ErrorState
-            message={
-              lang === "id"
-                ? "Artikel sementara tidak tersedia. Coba lagi."
-                : "Articles are temporarily unavailable. Try again."
-            }
-            retryLabel={lang === "id" ? "Coba lagi" : "Try again"}
+            message={t.error}
+            retryLabel={t.retry}
             onRetry={() => {
-              setResult({ lang, status: "loading", articles: [] })
+              setResult({ status: "loading", articles: [] })
               setRetry((value) => value + 1)
             }}
           />
-        ) : articles.length === 0 ? (
+        ) : result.articles.length === 0 ? (
           <div
             style={{
               padding: "3rem 1.5rem",
@@ -154,17 +148,17 @@ export default function JurnalListPage() {
           </div>
         ) : (
           <div>
-            {articles.map((article, i) => (
+            {result.articles.map((article, index) => (
               <div
                 key={article.id}
                 style={{
                   borderBottom:
-                    i < articles.length - 1
+                    index < result.articles.length - 1
                       ? "1px solid var(--hairline)"
                       : "none",
                 }}
               >
-                <ArticleCard article={article} index={i} />
+                <ArticleCard article={article} index={index} locale={locale} />
               </div>
             ))}
           </div>
@@ -196,15 +190,15 @@ function ErrorState({
 function LoadingList() {
   return (
     <div>
-      {[0, 1, 2].map((i) => (
+      {[0, 1, 2].map((index) => (
         <div
-          key={i}
+          key={index}
           style={{
             display: "flex",
             gap: "14px",
             alignItems: "flex-start",
             padding: "14px 0",
-            borderBottom: i < 2 ? "1px solid var(--hairline)" : "none",
+            borderBottom: index < 2 ? "1px solid var(--hairline)" : "none",
             opacity: 0.4,
           }}
         >

@@ -11,13 +11,18 @@ describe("site URL", () => {
   it("removes a configured trailing slash", async () => {
     vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://example.com/")
     vi.resetModules()
-    const { SITE_URL, absoluteUrl, articleUrl } = await import("./site")
+    const { SITE_URL, absoluteUrl, articleUrl, projectUrl } = await import(
+      "./site"
+    )
     expect(SITE_URL).toBe("https://example.com")
     expect(absoluteUrl("/id/jurnal/artikel-id")).toBe(
       "https://example.com/id/jurnal/artikel-id",
     )
-    expect(articleUrl("artikel-id")).toBe(
-      "https://example.com/jurnal/artikel-id",
+    expect(articleUrl("id", "artikel id")).toBe(
+      "https://example.com/id/jurnal/artikel%20id",
+    )
+    expect(projectUrl("en", "project one")).toBe(
+      "https://example.com/en/portfolio/project%20one",
     )
   })
 })

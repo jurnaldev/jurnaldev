@@ -12,7 +12,7 @@ export default defineConfig({
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: {
     command: "pnpm start",
-    url: "http://127.0.0.1:3000",
+    url: "http://127.0.0.1:3000/en",
     reuseExistingServer: !process.env.CI,
     env: {
       NEXT_PUBLIC_SITE_URL: "http://127.0.0.1:3000",

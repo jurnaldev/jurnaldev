@@ -5,15 +5,23 @@ import { usePathname } from "next/navigation"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { LangToggle } from "@/components/lang-toggle"
 import { useLang } from "@/contexts/lang-context"
+import { homePath, journalPath, portfolioPath } from "@/lib/i18n/routing"
 
 const nav = {
   en: { home: "Home", journal: "Journal", portfolio: "Portfolio" },
   id: { home: "Beranda", journal: "Jurnal", portfolio: "Portofolio" },
 }
 
-export function SiteHeader({ marginBottom = "3rem" }: { marginBottom?: string }) {
+export function SiteHeader({
+  marginBottom = "3rem",
+  alternateHref,
+}: {
+  marginBottom?: string
+  alternateHref?: string | null
+}) {
   const { lang } = useLang()
   const pathname = usePathname()
+  const localizedHomePath = homePath(lang)
 
   return (
     <header
@@ -37,7 +45,7 @@ export function SiteHeader({ marginBottom = "3rem" }: { marginBottom?: string })
         }}
       >
         <Link
-          href="/"
+          href={localizedHomePath}
           style={{
             color: "var(--ink)",
             textDecoration: "none",
@@ -54,11 +62,14 @@ export function SiteHeader({ marginBottom = "3rem" }: { marginBottom?: string })
 
         <nav style={{ display: "flex", gap: "16px" }}>
           {[
-            { href: "/", label: nav[lang].home },
-            { href: "/jurnal", label: nav[lang].journal },
-            { href: "/portfolio", label: nav[lang].portfolio },
+            { href: localizedHomePath, label: nav[lang].home },
+            { href: journalPath(lang), label: nav[lang].journal },
+            { href: portfolioPath(lang), label: nav[lang].portfolio },
           ].map(({ href, label }) => {
-            const active = href === "/" ? pathname === "/" : pathname?.startsWith(href)
+            const active =
+              href === localizedHomePath
+                ? pathname === localizedHomePath
+                : pathname === href || pathname?.startsWith(`${href}/`)
             return (
               <Link
                 key={href}
@@ -70,9 +81,13 @@ export function SiteHeader({ marginBottom = "3rem" }: { marginBottom?: string })
                   fontWeight: 600,
                   transition: "color 0.15s ease",
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = "var(--ink)")}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.color = "var(--ink)")
+                }
                 onMouseLeave={(e) =>
-                  (e.currentTarget.style.color = active ? "var(--ink)" : "var(--slate)")
+                  (e.currentTarget.style.color = active
+                    ? "var(--ink)"
+                    : "var(--slate)")
                 }
               >
                 {label}
@@ -83,7 +98,7 @@ export function SiteHeader({ marginBottom = "3rem" }: { marginBottom?: string })
       </div>
 
       <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-        <LangToggle />
+        <LangToggle alternateHref={alternateHref} />
         <ThemeToggle />
       </div>
     </header>

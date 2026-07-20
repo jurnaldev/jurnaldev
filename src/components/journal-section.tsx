@@ -1,124 +1,28 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import Link from "next/link"
 import { ImageOff } from "lucide-react"
-import { useLang, type Lang } from "@/contexts/lang-context"
-import { strapiMediaUrl } from "@/lib/strapi"
+
 import { formatDateShort, formatEntryNumber } from "@/lib/article-utils"
+import { articlePath, journalPath, type Locale } from "@/lib/i18n/routing"
+import { strapiMediaUrl } from "@/lib/strapi"
 import type { StrapiArticleSummary, StrapiEmptyState } from "@/lib/strapi/types"
-import { loadArticles } from "@/lib/client/load-articles"
 
 interface Props {
-  emptyState: Record<Lang, StrapiEmptyState>
-  viewAllLabel: Record<Lang, string>
+  articles: StrapiArticleSummary[]
+  emptyState: StrapiEmptyState
+  locale: Locale
+  viewAllLabel: string
 }
 
-export function JournalSection({ emptyState, viewAllLabel }: Props) {
-  const { lang } = useLang()
-  const [retry, setRetry] = useState(0)
-  const [result, setResult] = useState<{
-    lang: Lang
-    status: "loading" | "success" | "error"
-    articles: StrapiArticleSummary[]
-  }>({ lang, status: "loading", articles: [] })
-  const current =
-    result.lang === lang
-      ? result
-      : { lang, status: "loading" as const, articles: [] }
-  const articles = current.articles
-
-  useEffect(() => {
-    const controller = new AbortController()
-    loadArticles(`/api/articles?locale=${lang}&limit=3`, controller.signal)
-      .then((nextArticles) => {
-        setResult({ lang, status: "success", articles: nextArticles })
-      })
-      .catch((error: unknown) => {
-        if (error instanceof DOMException && error.name === "AbortError") return
-        setResult({ lang, status: "error", articles: [] })
-      })
-    return () => controller.abort()
-  }, [lang, retry])
-
-  if (current.status === "error") {
-    return (
-      <div style={{ padding: "1.5rem", border: "1px solid var(--hairline)" }}>
-        <p style={{ color: "var(--graphite)" }}>
-          {lang === "id"
-            ? "Artikel sementara tidak tersedia. Coba lagi."
-            : "Articles are temporarily unavailable. Try again."}
-        </p>
-        <button
-          type="button"
-          onClick={() => {
-            setResult({ lang, status: "loading", articles: [] })
-            setRetry((value) => value + 1)
-          }}
-        >
-          {lang === "id" ? "Coba lagi" : "Try again"}
-        </button>
-      </div>
-    )
-  }
-
-  if (current.status === "success" && articles.length === 0) {
-    return <EmptyState empty={emptyState[lang]} />
-  }
-
-  if (current.status === "loading") {
-    return (
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          marginBottom: "1.5rem",
-        }}
-      >
-        {[0, 1, 2].map((i) => (
-          <div
-            key={i}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-              padding: "12px 0",
-              borderBottom: i < 2 ? "1px solid var(--hairline)" : "none",
-              opacity: 0.4,
-            }}
-          >
-            <div
-              style={{
-                width: "56px",
-                height: "38px",
-                background: "var(--hairline)",
-                borderRadius: "6px",
-                flexShrink: 0,
-              }}
-            />
-            <div style={{ flex: 1 }}>
-              <div
-                style={{
-                  height: "9px",
-                  background: "var(--hairline)",
-                  borderRadius: "3px",
-                  marginBottom: "6px",
-                  width: "30%",
-                }}
-              />
-              <div
-                style={{
-                  height: "13px",
-                  background: "var(--hairline)",
-                  borderRadius: "3px",
-                  width: "75%",
-                }}
-              />
-            </div>
-          </div>
-        ))}
-      </div>
-    )
+export function JournalSection({
+  articles,
+  emptyState,
+  locale,
+  viewAllLabel,
+}: Props) {
+  if (articles.length === 0) {
+    return <EmptyState empty={emptyState} />
   }
 
   return (
@@ -130,12 +34,13 @@ export function JournalSection({ emptyState, viewAllLabel }: Props) {
           marginBottom: "1.5rem",
         }}
       >
-        {articles.map((article, i) => {
+        {articles.map((article, index) => {
           const coverUrl = strapiMediaUrl(article.cover?.url)
+
           return (
             <Link
               key={article.id}
-              href={`/jurnal/${article.slug}`}
+              href={articlePath(locale, article.slug)}
               className="article-card-row card-enter"
               style={{
                 display: "flex",
@@ -143,16 +48,20 @@ export function JournalSection({ emptyState, viewAllLabel }: Props) {
                 gap: "12px",
                 padding: "12px 0",
                 borderBottom:
-                  i < articles.length - 1
+                  index < articles.length - 1
                     ? "1px solid var(--hairline)"
                     : "none",
                 textDecoration: "none",
                 color: "inherit",
                 transition: "opacity 0.15s ease",
-                animationDelay: `${i * 60}ms`,
+                animationDelay: `${index * 60}ms`,
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.7")}
-              onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+              onMouseEnter={(event) => {
+                event.currentTarget.style.opacity = "0.7"
+              }}
+              onMouseLeave={(event) => {
+                event.currentTarget.style.opacity = "1"
+              }}
             >
               {coverUrl ? (
                 <div
@@ -220,7 +129,7 @@ export function JournalSection({ emptyState, viewAllLabel }: Props) {
       </div>
 
       <Link
-        href="/jurnal"
+        href={journalPath(locale)}
         style={{
           display: "inline-flex",
           alignItems: "center",
@@ -234,10 +143,14 @@ export function JournalSection({ emptyState, viewAllLabel }: Props) {
           textDecoration: "none",
           transition: "opacity 0.15s ease",
         }}
-        onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.7")}
-        onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+        onMouseEnter={(event) => {
+          event.currentTarget.style.opacity = "0.7"
+        }}
+        onMouseLeave={(event) => {
+          event.currentTarget.style.opacity = "1"
+        }}
       >
-        {viewAllLabel[lang]}
+        {viewAllLabel}
       </Link>
     </>
   )

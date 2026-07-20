@@ -4,18 +4,21 @@ import type { StrapiArticleSummary } from "@/lib/strapi/types"
 import { formatDateShort, formatEntryNumber } from "@/lib/article-utils"
 import { strapiMediaUrl } from "@/lib/strapi"
 import { Tag } from "@/components/ui/tag"
+import { articlePath, type Locale } from "@/lib/i18n/routing"
 
 export function ArticleCard({
   article,
+  locale = article.locale,
 }: {
   article: StrapiArticleSummary
+  locale?: Locale
   index?: number
 }) {
   const coverUrl = strapiMediaUrl(article.cover?.url)
 
   return (
     <Link
-      href={`/jurnal/${article.slug}`}
+      href={articlePath(locale, article.slug)}
       className="article-card-row"
       style={{
         display: "flex",
