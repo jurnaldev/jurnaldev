@@ -1,8 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server"
 
 import { resolveLegacySlug } from "@/lib/i18n/legacy-redirect"
-import { articlePath } from "@/lib/i18n/routing"
 import { fetchArticleBySlug } from "@/lib/strapi"
+import { articleUrl } from "@/lib/site"
 
 interface LegacyArticleRouteContext {
   params: Promise<{ slug: string }>
@@ -16,7 +16,5 @@ export async function GET(
   const resolved = await resolveLegacySlug(slug, fetchArticleBySlug)
   if (!resolved) return new NextResponse(null, { status: 404 })
 
-  const target = request.nextUrl.clone()
-  target.pathname = articlePath(resolved.locale, resolved.slug)
-  return NextResponse.redirect(target, 308)
+  return NextResponse.redirect(articleUrl(resolved.locale, resolved.slug), 308)
 }

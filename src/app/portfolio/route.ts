@@ -1,9 +1,7 @@
-import { type NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
+import { homePath } from "@/lib/i18n/routing"
+import { absoluteUrl } from "@/lib/site"
 
-import { portfolioPath } from "@/lib/i18n/routing"
-
-export function GET(request: NextRequest) {
-  const target = request.nextUrl.clone()
-  target.pathname = portfolioPath("en")
-  return NextResponse.redirect(target, 308)
+export function GET() {
+  return NextResponse.redirect(absoluteUrl(homePath("en")), 308)
 }
