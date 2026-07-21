@@ -178,6 +178,10 @@ html.no-transitions *::after {
   gap: 2rem;
 }
 
+.article-paragraph + .article-paragraph {
+  margin-top: 1rem !important;
+}
+
 @media (min-width: 1024px) {
   .article-layout {
     grid-template-columns: minmax(0, 1fr) 200px;

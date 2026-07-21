@@ -125,6 +125,7 @@ function MarkdownContent({
     ),
     p: ({ children, ...props }) => (
       <p
+        className="article-paragraph"
         style={{
           fontSize: "1rem",
           lineHeight: 1.75,
