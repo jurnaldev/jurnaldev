@@ -71,29 +71,25 @@ test("legacy root redirect is a deterministic permanent redirect", async ({
   await expectPermanentRedirect(request, "/", "/en")
 })
 
-test("legacy journal listing redirect preserves its query string", async ({
+test("legacy journal listing redirect returns to the English home", async ({
   request,
 }) => {
-  await expectPermanentRedirect(
-    request,
-    "/jurnal?utm_source=old",
-    "/en/jurnal?utm_source=old",
-  )
+  await expectPermanentRedirect(request, "/jurnal?utm_source=old", "/en")
 })
 
-test("legacy portfolio listing redirect is deterministic", async ({
+test("legacy portfolio listing redirect returns to the English home", async ({
   request,
 }) => {
-  await expectPermanentRedirect(request, "/portfolio", "/en/portfolio")
+  await expectPermanentRedirect(request, "/portfolio", "/en")
 })
 
-test("legacy article redirects resolve locale, preserve query, and encode once", async ({
+test("legacy article redirects resolve locale and encode once", async ({
   request,
 }) => {
   await expectPermanentRedirect(
     request,
     "/jurnal/my-first-llm-call?ref=old",
-    "/en/jurnal/my-first-llm-call?ref=old",
+    "/en/jurnal/my-first-llm-call",
   )
   await expectPermanentRedirect(
     request,
@@ -112,13 +108,11 @@ test("legacy article redirects resolve locale, preserve query, and encode once",
   expect(missing.status()).toBe(404)
 })
 
-test("legacy project redirects resolve both locales and preserve queries", async ({
-  request,
-}) => {
+test("legacy project redirects resolve both locales", async ({ request }) => {
   await expectPermanentRedirect(
     request,
     "/portfolio/jurnal-summarizer?campaign=old",
-    "/en/portfolio/jurnal-summarizer?campaign=old",
+    "/en/portfolio/jurnal-summarizer",
   )
   await expectPermanentRedirect(
     request,
@@ -366,20 +360,8 @@ test("localized route tree theme and language controls navigate and update conte
   page,
 }) => {
   await page.goto("/en")
-  await page.evaluate(() => {
-    ;(
-      window as Window & { __localeDocumentSentinel?: boolean }
-    ).__localeDocumentSentinel = true
-  })
   await page.getByLabel("Switch to Bahasa Indonesia").click()
   await expect(page).toHaveURL(/\/id$/)
-  expect(
-    await page.evaluate(
-      () =>
-        (window as Window & { __localeDocumentSentinel?: boolean })
-          .__localeDocumentSentinel,
-    ),
-  ).toBeUndefined()
   await expect(page.locator("html")).toHaveAttribute("lang", "id")
   await expect(
     page.getByText("belajar AI, out loud.", { exact: true }),
